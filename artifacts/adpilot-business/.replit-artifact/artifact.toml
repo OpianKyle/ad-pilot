@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "AdPilot Business"
+description = "A business campaign workspace for creating and organizing social media campaigns with secure account access."
+version = "1.0.0"
+id = "artifacts/adpilot-business"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19978
+
+[services.development]
+run = "pnpm --filter @workspace/adpilot-business run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/adpilot-business", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/adpilot-business/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19978"
+BASE_PATH = "/"
