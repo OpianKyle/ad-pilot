@@ -72,9 +72,7 @@ export async function ensureSessionTable(): Promise<void> {
           created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
           PRIMARY KEY (session_id),
           KEY idx_adpilot_sessions_expires_at (expires_at),
-          KEY idx_adpilot_sessions_user_id (user_id),
-          CONSTRAINT fk_adpilot_sessions_user
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+          KEY idx_adpilot_sessions_user_id (user_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
       )
       .then(() => undefined)
