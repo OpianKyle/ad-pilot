@@ -33,8 +33,6 @@ const authLimiter = rateLimit({
   message: { error: "Too many attempts. Please wait and try again." },
 });
 
-router.use("/auth", authLimiter);
-
 function databaseUnavailable(res: Response): void {
   res.status(503).json({ error: "The MySQL database is not configured or is unavailable." });
 }
@@ -104,7 +102,7 @@ router.get("/auth/me", async (req, res): Promise<void> => {
   }
 });
 
-router.post("/auth/register", async (req, res): Promise<void> => {
+router.post("/auth/register", authLimiter, async (req, res): Promise<void> => {
   if (!isMysqlConfigured()) {
     databaseUnavailable(res);
     return;
@@ -183,7 +181,7 @@ router.post("/auth/register", async (req, res): Promise<void> => {
   }
 });
 
-router.post("/auth/login", async (req, res): Promise<void> => {
+router.post("/auth/login", authLimiter, async (req, res): Promise<void> => {
   if (!isMysqlConfigured()) {
     databaseUnavailable(res);
     return;
