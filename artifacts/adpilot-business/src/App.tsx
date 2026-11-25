@@ -16,6 +16,8 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import PreviewWorkspace from '@/pages/preview-workspace';
+import MetaChannelsPage from '@/pages/meta-channels';
+import PublishingPlannerPage from '@/pages/publishing-planner';
 import { workspaceSections } from '@/lib/workspace-sections';
 import {
   ArrowDownRight,
@@ -90,6 +92,7 @@ function AppFrame() {
     httpStatus(current.error) === 503 || httpStatus(csrf.error) === 503;
   const isAuthRoute = location === '/login' || location === '/register';
   const activeWorkspaceSection = workspaceSections.find((section) => section.path === location);
+  const isLivePublishingRoute = location === '/connections' || location === '/planner';
   const embeddedSection =
     activeWorkspaceSection && activeWorkspaceSection.id !== 'overview'
       ? activeWorkspaceSection
@@ -129,7 +132,7 @@ function AppFrame() {
               </Link>
               <button onClick={() => setMobileNav(false)} className="apw-mobile-close" aria-label="Close navigation" data-testid="button-close-navigation"><X size={18} /></button>
             </div>
-            {user && <div className="apw-demo-pill"><span />SECTION PREVIEW</div>}
+            {user && <div className="apw-demo-pill"><span />{isLivePublishingRoute ? 'LIVE CHANNELS' : 'SECTION PREVIEW'}</div>}
             <nav className={`apw-nav ${user ? '' : 'apw-auth-nav'}`}>
               {user ? (
                 (['Workspace', 'Campaigns', 'Business'] as const).map((group) => (
@@ -160,8 +163,8 @@ function AppFrame() {
             <div className="apw-sidebar-bottom">
               <div className="apw-sidebar-note">
                 <div className="apw-note-icon"><CircleHelp size={15} /></div>
-                <p>{user ? 'Your work stays here until you decide what to do next.' : 'Your campaigns stay here while you shape the next step.'}</p>
-                <span>{user ? 'NO CONNECTIONS · NO PUBLISHING' : 'CHANNELS NOT CONNECTED'}</span>
+                <p>{isLivePublishingRoute ? 'Each business connects and publishes only through its own Meta destinations.' : user ? 'Your work stays here until you decide what to do next.' : 'Your campaigns stay here while you shape the next step.'}</p>
+                <span>{isLivePublishingRoute ? 'BUSINESS-OWNED DESTINATIONS' : user ? 'NO CONNECTIONS · NO PUBLISHING' : 'CHANNELS NOT CONNECTED'}</span>
               </div>
               {user ? (
                 <div className="apw-user-chip">
@@ -184,7 +187,7 @@ function AppFrame() {
               <div className="apw-breadcrumb"><span>ADPILOT</span><ChevronRight size={13} /><strong>{location === '/campaigns' ? 'Campaigns' : activeWorkspaceSection?.label ?? 'Overview'}</strong></div>
               <div className="apw-topbar-right">
                 {user && <span className="apw-working-as">Working as <strong>{user.name.split(' ')[0]}</strong></span>}
-                <span className={`apw-channel-state ${mysqlSetupNeeded ? 'apw-channel-setup' : ''}`}><span />{mysqlSetupNeeded ? 'Workspace setup needed' : 'Channels not connected'}</span>
+                <span className={`apw-channel-state ${mysqlSetupNeeded ? 'apw-channel-setup' : isLivePublishingRoute ? 'apw-channel-live' : ''}`}><span />{mysqlSetupNeeded ? 'Workspace setup needed' : isLivePublishingRoute ? 'Meta publishing' : 'Channels not connected'}</span>
               </div>
             </header>
             <div className="apw-content apw-auth-content">
@@ -196,6 +199,12 @@ function AppFrame() {
                 </Route>
                 <Route path="/campaigns">
                   {current.isLoading ? <WorkspaceLoading /> : user ? <CampaignsPage /> : <Unauthenticated currentError={current.isError && httpStatus(current.error) !== 401 ? messageFrom(current.error, 'We couldn’t check your session. Please sign in to continue.') : null} />}
+                </Route>
+                <Route path="/connections">
+                  {current.isLoading ? <WorkspaceLoading /> : user ? <MetaChannelsPage /> : <Unauthenticated currentError={current.isError && httpStatus(current.error) !== 401 ? messageFrom(current.error, 'We couldn’t check your session. Please sign in to continue.') : null} />}
+                </Route>
+                <Route path="/planner">
+                  {current.isLoading ? <WorkspaceLoading /> : user ? <PublishingPlannerPage /> : <Unauthenticated currentError={current.isError && httpStatus(current.error) !== 401 ? messageFrom(current.error, 'We couldn’t check your session. Please sign in to continue.') : null} />}
                 </Route>
                 <Route>
                   {current.isLoading ? (

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import {
   getGetAdpilotMetaConnectionQueryKey,
+  getListAdpilotScheduledPostsQueryKey,
   useDisconnectAdpilotMeta,
   useGetAdpilotMetaConnection,
   useGetCsrfToken,
@@ -55,6 +56,7 @@ export default function MetaChannelsPage() {
     if (result === "connected") {
       setNotice("Meta is connected. Choose the Page and Instagram account for this business.");
       void connection.refetch();
+      void queryClient.invalidateQueries({ queryKey: getListAdpilotScheduledPostsQueryKey() });
     } else if (result === "cancelled") {
       setNotice("Meta authorization was cancelled. You can connect again whenever you’re ready.");
     } else if (result === "failed") {
@@ -111,6 +113,8 @@ export default function MetaChannelsPage() {
       {
         onSuccess: (status: MetaConnectionStatus) => {
           queryClient.setQueryData(getGetAdpilotMetaConnectionQueryKey(), status);
+          void queryClient.invalidateQueries({ queryKey: getGetAdpilotMetaConnectionQueryKey() });
+          void queryClient.invalidateQueries({ queryKey: getListAdpilotScheduledPostsQueryKey() });
           setNotice("Your publishing destinations have been saved for this business.");
         },
         onError: (error) => setNotice(errorMessage(error)),
@@ -132,6 +136,8 @@ export default function MetaChannelsPage() {
           getGetAdpilotMetaConnectionQueryKey(),
           emptyConnection(),
         );
+        void queryClient.invalidateQueries({ queryKey: getGetAdpilotMetaConnectionQueryKey() });
+        void queryClient.invalidateQueries({ queryKey: getListAdpilotScheduledPostsQueryKey() });
         setFacebookPageId("");
         setInstagramAccountId("");
         setNotice("Meta has been disconnected. Existing published posts were not removed.");
@@ -168,10 +174,16 @@ export default function MetaChannelsPage() {
           <p>{notice}</p>
         </div>
       )}
+      {csrf.isError && (
+        <div className="apw-inline-load-error mb-4" role="alert" data-testid="status-meta-csrf-error">
+          <span>{errorMessage(csrf.error)}</span>
+          <button onClick={() => void csrf.refetch()} data-testid="button-retry-meta-csrf">Retry security check</button>
+        </div>
+      )}
 
       {connection.isLoading ? (
-        <div className="apw-panel flex items-center gap-3 p-6 text-sm text-[#758078]" role="status">
-          <LoaderCircle className="animate-spin" size={18} /> Checking this business’s Meta connection…
+        <div className="apw-panel apw-connection-loading" role="status" aria-label="Loading Meta connection">
+          <i /><i /><i /><span>Checking this business’s Meta connection</span>
         </div>
       ) : connection.isError ? (
         <div className="apw-panel p-6" role="alert" data-testid="status-meta-load-error">
