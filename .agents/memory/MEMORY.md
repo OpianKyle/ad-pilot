@@ -1,0 +1,1 @@
+- [AdPilot social account ownership](meta-account-ownership.md) — each business workspace connects its own Meta assets.
