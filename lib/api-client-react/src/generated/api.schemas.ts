@@ -505,6 +505,146 @@ export interface OAuthStartResponse {
   url: string;
 }
 
+export interface MetaAsset {
+  /** @maxLength 120 */
+  id: string;
+  /** @maxLength 180 */
+  name: string;
+}
+
+export interface MetaConnectionStatus {
+  connected: boolean;
+  /** @nullable */
+  connectedAt: string | null;
+  /** @nullable */
+  facebookPageId: string | null;
+  /** @nullable */
+  facebookPageName: string | null;
+  /** @nullable */
+  instagramAccountId: string | null;
+  /** @nullable */
+  instagramUsername: string | null;
+  availableFacebookPages: MetaAsset[];
+  availableInstagramAccounts: MetaAsset[];
+}
+
+export type MetaAssetSelectionInput = ({
+  facebookPageId?: string;
+} & ({
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  facebookPageId: string | null;
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  instagramAccountId: string | null;
+})) | ({
+  instagramAccountId?: string;
+} & ({
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  facebookPageId: string | null;
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  instagramAccountId: string | null;
+}));
+
+export type ScheduledPostInputPlatformsItem = typeof ScheduledPostInputPlatformsItem[keyof typeof ScheduledPostInputPlatformsItem];
+
+
+export const ScheduledPostInputPlatformsItem = {
+  facebook: 'facebook',
+  instagram: 'instagram',
+} as const;
+
+export interface ScheduledPostInput {
+  /**
+     * @minLength 1
+     * @maxLength 2200
+     */
+  caption: string;
+  /** @maxLength 1000 */
+  hashtags: string;
+  /** @pattern ^[a-f0-9]{32}$ */
+  assetId: string;
+  scheduledAt: string;
+  /**
+     * @minItems 1
+     * @maxItems 2
+     */
+  platforms: ScheduledPostInputPlatformsItem[];
+}
+
+export type ScheduledPostStatus = typeof ScheduledPostStatus[keyof typeof ScheduledPostStatus];
+
+
+export const ScheduledPostStatus = {
+  scheduled: 'scheduled',
+  publishing: 'publishing',
+  published: 'published',
+  needs_attention: 'needs_attention',
+  cancelled: 'cancelled',
+} as const;
+
+export type ScheduledPostPlatformsItem = typeof ScheduledPostPlatformsItem[keyof typeof ScheduledPostPlatformsItem];
+
+
+export const ScheduledPostPlatformsItem = {
+  facebook: 'facebook',
+  instagram: 'instagram',
+} as const;
+
+export interface ScheduledPost {
+  id: string;
+  status: ScheduledPostStatus;
+  caption: string;
+  hashtags: string;
+  assetId: string;
+  imageUrl: string;
+  scheduledAt: string;
+  platforms: ScheduledPostPlatformsItem[];
+  /** @nullable */
+  facebookState: string | null;
+  /** @nullable */
+  instagramState: string | null;
+  /** @nullable */
+  facebookRemoteId: string | null;
+  /** @nullable */
+  instagramRemoteId: string | null;
+  /** @nullable */
+  error: string | null;
+  createdAt: string;
+}
+
+export interface ScheduledPostList {
+  posts: ScheduledPost[];
+}
+
+export interface MetaDeletionReceipt {
+  url: string;
+  /** @pattern ^[a-f0-9]{32}$ */
+  confirmation_code: string;
+}
+
+export type MetaDeletionStatusStatus = typeof MetaDeletionStatusStatus[keyof typeof MetaDeletionStatusStatus];
+
+
+export const MetaDeletionStatusStatus = {
+  completed: 'completed',
+} as const;
+
+export interface MetaDeletionStatus {
+  status: MetaDeletionStatusStatus;
+  requestedAt: string;
+}
+
 export type AdminAccountStatus = typeof AdminAccountStatus[keyof typeof AdminAccountStatus];
 
 
@@ -660,4 +800,15 @@ export interface PaidCampaign {
 export interface PaidCampaignList {
   campaigns: PaidCampaign[];
 }
+
+export type CompleteAdpilotMetaOAuthParams = {
+code?: string;
+state?: string;
+error?: string;
+};
+
+export type ReceiveMetaDataDeletionRequestBody = {
+  /** @maxLength 12000 */
+  signed_request: string;
+};
 

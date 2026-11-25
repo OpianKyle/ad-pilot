@@ -38,6 +38,7 @@ import type {
   Campaign,
   CampaignInput,
   CampaignList,
+  CompleteAdpilotMetaOAuthParams,
   ConnectionVerification,
   Creative,
   CreativeCreateInput,
@@ -53,6 +54,10 @@ import type {
   MediaList,
   MediaUploadInput,
   MediaUploadResponse,
+  MetaAssetSelectionInput,
+  MetaConnectionStatus,
+  MetaDeletionReceipt,
+  MetaDeletionStatus,
   OAuthStartResponse,
   OkResponse,
   PaidCampaign,
@@ -62,8 +67,12 @@ import type {
   PasswordResetLink,
   ProviderCredentialsInput,
   ProviderStatus,
+  ReceiveMetaDataDeletionRequestBody,
   RegistrationInput,
-  ScheduleInput
+  ScheduleInput,
+  ScheduledPost,
+  ScheduledPostInput,
+  ScheduledPostList
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -2972,6 +2981,831 @@ export const useVerifyAdpilotConnections = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getVerifyAdpilotConnectionsMutationOptions(options), queryClient);
     }
+
+export const getGetAdpilotMetaConnectionUrl = () => {
+
+
+
+
+  return `/api/adpilot/connections/meta`
+}
+
+/**
+ * @summary Get the current business's Meta connection and shared assets
+ */
+export const getAdpilotMetaConnection = async ( options?: Parameters<typeof customFetch>[1]): Promise<MetaConnectionStatus> => {
+
+  return customFetch<MetaConnectionStatus>(getGetAdpilotMetaConnectionUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdpilotMetaConnectionQueryKey = () => {
+    return [
+    `/api/adpilot/connections/meta`
+    ] as const;
+    }
+
+
+export const getGetAdpilotMetaConnectionQueryOptions = <TData = Awaited<ReturnType<typeof getAdpilotMetaConnection>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotMetaConnection>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdpilotMetaConnectionQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdpilotMetaConnection>>> = ({ signal }) => getAdpilotMetaConnection({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdpilotMetaConnection>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAdpilotMetaConnectionQueryResult = NonNullable<Awaited<ReturnType<typeof getAdpilotMetaConnection>>>
+export type GetAdpilotMetaConnectionQueryError = ErrorType<unknown>
+
+
+export function useGetAdpilotMetaConnection<TData = Awaited<ReturnType<typeof getAdpilotMetaConnection>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotMetaConnection>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdpilotMetaConnection>>,
+          TError,
+          Awaited<ReturnType<typeof getAdpilotMetaConnection>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdpilotMetaConnection<TData = Awaited<ReturnType<typeof getAdpilotMetaConnection>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotMetaConnection>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdpilotMetaConnection>>,
+          TError,
+          Awaited<ReturnType<typeof getAdpilotMetaConnection>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdpilotMetaConnection<TData = Awaited<ReturnType<typeof getAdpilotMetaConnection>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotMetaConnection>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get the current business's Meta connection and shared assets
+ */
+
+export function useGetAdpilotMetaConnection<TData = Awaited<ReturnType<typeof getAdpilotMetaConnection>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotMetaConnection>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAdpilotMetaConnectionQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDisconnectAdpilotMetaUrl = () => {
+
+
+
+
+  return `/api/adpilot/connections/meta`
+}
+
+/**
+ * @summary Disconnect Meta and cancel its pending posts
+ */
+export const disconnectAdpilotMeta = async ( options?: Parameters<typeof customFetch>[1]): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getDisconnectAdpilotMetaUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDisconnectAdpilotMetaMutationKey = () => ['disconnectAdpilotMeta'] as const;
+
+export const getDisconnectAdpilotMetaMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectAdpilotMeta>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof disconnectAdpilotMeta>>, TError,void, TContext> => {
+
+const mutationKey = getDisconnectAdpilotMetaMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof disconnectAdpilotMeta>>, void> = () => {
+
+
+          return  disconnectAdpilotMeta(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DisconnectAdpilotMetaMutationResult = NonNullable<Awaited<ReturnType<typeof disconnectAdpilotMeta>>>
+
+    export type DisconnectAdpilotMetaMutationError = ErrorType<unknown>
+
+
+    /**
+ * @summary Disconnect Meta and cancel its pending posts
+ */
+export const useDisconnectAdpilotMeta = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectAdpilotMeta>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof disconnectAdpilotMeta>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getDisconnectAdpilotMetaMutationOptions(options), queryClient);
+    }
+
+export const getSelectAdpilotMetaAssetsUrl = () => {
+
+
+
+
+  return `/api/adpilot/connections/meta/select`
+}
+
+/**
+ * @summary Choose the Facebook Page and Instagram account for this business
+ */
+export const selectAdpilotMetaAssets = async (metaAssetSelectionInput: MetaAssetSelectionInput, options?: Parameters<typeof customFetch>[1]): Promise<MetaConnectionStatus> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<MetaConnectionStatus>(getSelectAdpilotMetaAssetsUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(metaAssetSelectionInput)
+  }
+);}
+
+
+
+
+
+export const getSelectAdpilotMetaAssetsMutationKey = () => ['selectAdpilotMetaAssets'] as const;
+
+export const getSelectAdpilotMetaAssetsMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof selectAdpilotMetaAssets>>, TError,SelectAdpilotMetaAssetsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof selectAdpilotMetaAssets>>, TError,SelectAdpilotMetaAssetsMutationVariables, TContext> => {
+
+const mutationKey = getSelectAdpilotMetaAssetsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof selectAdpilotMetaAssets>>, SelectAdpilotMetaAssetsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  selectAdpilotMetaAssets(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SelectAdpilotMetaAssetsMutationResult = NonNullable<Awaited<ReturnType<typeof selectAdpilotMetaAssets>>>
+    export type SelectAdpilotMetaAssetsMutationBody = BodyType<MetaAssetSelectionInput>
+    export type SelectAdpilotMetaAssetsMutationError = ErrorType<void>
+    export type SelectAdpilotMetaAssetsMutationVariables = {data: BodyType<MetaAssetSelectionInput>}
+
+    /**
+ * @summary Choose the Facebook Page and Instagram account for this business
+ */
+export const useSelectAdpilotMetaAssets = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof selectAdpilotMetaAssets>>, TError,SelectAdpilotMetaAssetsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof selectAdpilotMetaAssets>>,
+        TError,
+        SelectAdpilotMetaAssetsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSelectAdpilotMetaAssetsMutationOptions(options), queryClient);
+    }
+
+export const getListAdpilotScheduledPostsUrl = () => {
+
+
+
+
+  return `/api/adpilot/posts`
+}
+
+/**
+ * @summary List this business's scheduled Meta posts
+ */
+export const listAdpilotScheduledPosts = async ( options?: Parameters<typeof customFetch>[1]): Promise<ScheduledPostList> => {
+
+  return customFetch<ScheduledPostList>(getListAdpilotScheduledPostsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdpilotScheduledPostsQueryKey = () => {
+    return [
+    `/api/adpilot/posts`
+    ] as const;
+    }
+
+
+export const getListAdpilotScheduledPostsQueryOptions = <TData = Awaited<ReturnType<typeof listAdpilotScheduledPosts>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotScheduledPosts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdpilotScheduledPostsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdpilotScheduledPosts>>> = ({ signal }) => listAdpilotScheduledPosts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdpilotScheduledPosts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAdpilotScheduledPostsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdpilotScheduledPosts>>>
+export type ListAdpilotScheduledPostsQueryError = ErrorType<unknown>
+
+
+export function useListAdpilotScheduledPosts<TData = Awaited<ReturnType<typeof listAdpilotScheduledPosts>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotScheduledPosts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdpilotScheduledPosts>>,
+          TError,
+          Awaited<ReturnType<typeof listAdpilotScheduledPosts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdpilotScheduledPosts<TData = Awaited<ReturnType<typeof listAdpilotScheduledPosts>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotScheduledPosts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdpilotScheduledPosts>>,
+          TError,
+          Awaited<ReturnType<typeof listAdpilotScheduledPosts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdpilotScheduledPosts<TData = Awaited<ReturnType<typeof listAdpilotScheduledPosts>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotScheduledPosts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List this business's scheduled Meta posts
+ */
+
+export function useListAdpilotScheduledPosts<TData = Awaited<ReturnType<typeof listAdpilotScheduledPosts>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotScheduledPosts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAdpilotScheduledPostsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateAdpilotScheduledPostUrl = () => {
+
+
+
+
+  return `/api/adpilot/posts`
+}
+
+/**
+ * @summary Schedule a photo and caption for selected Meta channels
+ */
+export const createAdpilotScheduledPost = async (scheduledPostInput: ScheduledPostInput, options?: Parameters<typeof customFetch>[1]): Promise<ScheduledPost> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ScheduledPost>(getCreateAdpilotScheduledPostUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(scheduledPostInput)
+  }
+);}
+
+
+
+
+
+export const getCreateAdpilotScheduledPostMutationKey = () => ['createAdpilotScheduledPost'] as const;
+
+export const getCreateAdpilotScheduledPostMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdpilotScheduledPost>>, TError,CreateAdpilotScheduledPostMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdpilotScheduledPost>>, TError,CreateAdpilotScheduledPostMutationVariables, TContext> => {
+
+const mutationKey = getCreateAdpilotScheduledPostMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdpilotScheduledPost>>, CreateAdpilotScheduledPostMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAdpilotScheduledPost(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdpilotScheduledPostMutationResult = NonNullable<Awaited<ReturnType<typeof createAdpilotScheduledPost>>>
+    export type CreateAdpilotScheduledPostMutationBody = BodyType<ScheduledPostInput>
+    export type CreateAdpilotScheduledPostMutationError = ErrorType<void>
+    export type CreateAdpilotScheduledPostMutationVariables = {data: BodyType<ScheduledPostInput>}
+
+    /**
+ * @summary Schedule a photo and caption for selected Meta channels
+ */
+export const useCreateAdpilotScheduledPost = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdpilotScheduledPost>>, TError,CreateAdpilotScheduledPostMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAdpilotScheduledPost>>,
+        TError,
+        CreateAdpilotScheduledPostMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateAdpilotScheduledPostMutationOptions(options), queryClient);
+    }
+
+export const getCancelAdpilotScheduledPostUrl = (id: string,) => {
+
+
+
+
+  return `/api/adpilot/posts/${id}`
+}
+
+/**
+ * @summary Cancel a post that has not started publishing
+ */
+export const cancelAdpilotScheduledPost = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getCancelAdpilotScheduledPostUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getCancelAdpilotScheduledPostMutationKey = () => ['cancelAdpilotScheduledPost'] as const;
+
+export const getCancelAdpilotScheduledPostMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelAdpilotScheduledPost>>, TError,CancelAdpilotScheduledPostMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelAdpilotScheduledPost>>, TError,CancelAdpilotScheduledPostMutationVariables, TContext> => {
+
+const mutationKey = getCancelAdpilotScheduledPostMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelAdpilotScheduledPost>>, CancelAdpilotScheduledPostMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  cancelAdpilotScheduledPost(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelAdpilotScheduledPostMutationResult = NonNullable<Awaited<ReturnType<typeof cancelAdpilotScheduledPost>>>
+
+    export type CancelAdpilotScheduledPostMutationError = ErrorType<void>
+    export type CancelAdpilotScheduledPostMutationVariables = {id: string}
+
+    /**
+ * @summary Cancel a post that has not started publishing
+ */
+export const useCancelAdpilotScheduledPost = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelAdpilotScheduledPost>>, TError,CancelAdpilotScheduledPostMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof cancelAdpilotScheduledPost>>,
+        TError,
+        CancelAdpilotScheduledPostMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCancelAdpilotScheduledPostMutationOptions(options), queryClient);
+    }
+
+export const getCompleteAdpilotMetaOAuthUrl = (params?: CompleteAdpilotMetaOAuthParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/adpilot/oauth/meta/callback?${stringifiedParams}` : `/api/adpilot/oauth/meta/callback`
+}
+
+/**
+ * @summary Finish Meta authorization and save shared business assets
+ */
+export const completeAdpilotMetaOAuth = async (params?: CompleteAdpilotMetaOAuthParams, options?: Parameters<typeof customFetch>[1]): Promise<unknown> => {
+
+  return customFetch<unknown>(getCompleteAdpilotMetaOAuthUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getCompleteAdpilotMetaOAuthQueryKey = (params?: CompleteAdpilotMetaOAuthParams,) => {
+    return [
+    `/api/adpilot/oauth/meta/callback`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getCompleteAdpilotMetaOAuthQueryOptions = <TData = Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>, TError = ErrorType<void>>(params?: CompleteAdpilotMetaOAuthParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCompleteAdpilotMetaOAuthQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>> = ({ signal }) => completeAdpilotMetaOAuth(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CompleteAdpilotMetaOAuthQueryResult = NonNullable<Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>>
+export type CompleteAdpilotMetaOAuthQueryError = ErrorType<void>
+
+
+export function useCompleteAdpilotMetaOAuth<TData = Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>, TError = ErrorType<void>>(
+ params: undefined |  CompleteAdpilotMetaOAuthParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>,
+          TError,
+          Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCompleteAdpilotMetaOAuth<TData = Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>, TError = ErrorType<void>>(
+ params?: CompleteAdpilotMetaOAuthParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>,
+          TError,
+          Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCompleteAdpilotMetaOAuth<TData = Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>, TError = ErrorType<void>>(
+ params?: CompleteAdpilotMetaOAuthParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Finish Meta authorization and save shared business assets
+ */
+
+export function useCompleteAdpilotMetaOAuth<TData = Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>, TError = ErrorType<void>>(
+ params?: CompleteAdpilotMetaOAuthParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof completeAdpilotMetaOAuth>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCompleteAdpilotMetaOAuthQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getReceiveMetaDataDeletionRequestUrl = () => {
+
+
+
+
+  return `/api/meta/data-deletion`
+}
+
+/**
+ * @summary Verify and process Meta's signed data-deletion request
+ */
+export const receiveMetaDataDeletionRequest = async (receiveMetaDataDeletionRequestBody: ReceiveMetaDataDeletionRequestBody, options?: Parameters<typeof customFetch>[1]): Promise<MetaDeletionReceipt> => {
+    const formUrlEncoded = new URLSearchParams();
+formUrlEncoded.append(`signed_request`, receiveMetaDataDeletionRequestBody.signed_request);
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<MetaDeletionReceipt>(getReceiveMetaDataDeletionRequestUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...getHeaders(options?.headers) },
+    body: formUrlEncoded
+  }
+);}
+
+
+
+
+
+export const getReceiveMetaDataDeletionRequestMutationKey = () => ['receiveMetaDataDeletionRequest'] as const;
+
+export const getReceiveMetaDataDeletionRequestMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof receiveMetaDataDeletionRequest>>, TError,ReceiveMetaDataDeletionRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof receiveMetaDataDeletionRequest>>, TError,ReceiveMetaDataDeletionRequestMutationVariables, TContext> => {
+
+const mutationKey = getReceiveMetaDataDeletionRequestMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof receiveMetaDataDeletionRequest>>, ReceiveMetaDataDeletionRequestMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  receiveMetaDataDeletionRequest(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReceiveMetaDataDeletionRequestMutationResult = NonNullable<Awaited<ReturnType<typeof receiveMetaDataDeletionRequest>>>
+    export type ReceiveMetaDataDeletionRequestMutationBody = BodyType<ReceiveMetaDataDeletionRequestBody>
+    export type ReceiveMetaDataDeletionRequestMutationError = ErrorType<void>
+    export type ReceiveMetaDataDeletionRequestMutationVariables = {data: BodyType<ReceiveMetaDataDeletionRequestBody>}
+
+    /**
+ * @summary Verify and process Meta's signed data-deletion request
+ */
+export const useReceiveMetaDataDeletionRequest = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof receiveMetaDataDeletionRequest>>, TError,ReceiveMetaDataDeletionRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof receiveMetaDataDeletionRequest>>,
+        TError,
+        ReceiveMetaDataDeletionRequestMutationVariables,
+        TContext
+      > => {
+      return useMutation(getReceiveMetaDataDeletionRequestMutationOptions(options), queryClient);
+    }
+
+export const getGetMetaDataDeletionStatusUrl = (code: string,) => {
+
+
+
+
+  return `/api/meta/data-deletion/${code}`
+}
+
+/**
+ * @summary Check the completion status of a Meta deletion request
+ */
+export const getMetaDataDeletionStatus = async (code: string, options?: Parameters<typeof customFetch>[1]): Promise<MetaDeletionStatus> => {
+
+  return customFetch<MetaDeletionStatus>(getGetMetaDataDeletionStatusUrl(code),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMetaDataDeletionStatusQueryKey = (code: string,) => {
+    return [
+    `/api/meta/data-deletion/${code}`
+    ] as const;
+    }
+
+
+export const getGetMetaDataDeletionStatusQueryOptions = <TData = Awaited<ReturnType<typeof getMetaDataDeletionStatus>>, TError = ErrorType<void>>(code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMetaDataDeletionStatus>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMetaDataDeletionStatusQueryKey(code);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMetaDataDeletionStatus>>> = ({ signal }) => getMetaDataDeletionStatus(code, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: code !== null && code !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMetaDataDeletionStatus>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMetaDataDeletionStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getMetaDataDeletionStatus>>>
+export type GetMetaDataDeletionStatusQueryError = ErrorType<void>
+
+
+export function useGetMetaDataDeletionStatus<TData = Awaited<ReturnType<typeof getMetaDataDeletionStatus>>, TError = ErrorType<void>>(
+ code: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMetaDataDeletionStatus>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMetaDataDeletionStatus>>,
+          TError,
+          Awaited<ReturnType<typeof getMetaDataDeletionStatus>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMetaDataDeletionStatus<TData = Awaited<ReturnType<typeof getMetaDataDeletionStatus>>, TError = ErrorType<void>>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMetaDataDeletionStatus>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMetaDataDeletionStatus>>,
+          TError,
+          Awaited<ReturnType<typeof getMetaDataDeletionStatus>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMetaDataDeletionStatus<TData = Awaited<ReturnType<typeof getMetaDataDeletionStatus>>, TError = ErrorType<void>>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMetaDataDeletionStatus>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Check the completion status of a Meta deletion request
+ */
+
+export function useGetMetaDataDeletionStatus<TData = Awaited<ReturnType<typeof getMetaDataDeletionStatus>>, TError = ErrorType<void>>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMetaDataDeletionStatus>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMetaDataDeletionStatusQueryOptions(code,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getStartAdpilotOAuthUrl = (provider: 'meta' | 'linkedin',) => {
 

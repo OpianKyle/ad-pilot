@@ -522,6 +522,168 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConnectionVerification"
+  /adpilot/connections/meta:
+    get:
+      operationId: getAdpilotMetaConnection
+      tags: [adpilot]
+      summary: Get the current business's Meta connection and shared assets
+      responses:
+        "200":
+          description: Meta connection details without access tokens
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetaConnectionStatus"
+    delete:
+      operationId: disconnectAdpilotMeta
+      tags: [adpilot]
+      summary: Disconnect Meta and cancel its pending posts
+      responses:
+        "200":
+          description: Meta connection removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+  /adpilot/connections/meta/select:
+    put:
+      operationId: selectAdpilotMetaAssets
+      tags: [adpilot]
+      summary: Choose the Facebook Page and Instagram account for this business
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetaAssetSelectionInput"
+      responses:
+        "200":
+          description: Publishing destinations saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetaConnectionStatus"
+        "422":
+          description: Selected assets were not shared with this app
+  /adpilot/posts:
+    get:
+      operationId: listAdpilotScheduledPosts
+      tags: [adpilot]
+      summary: List this business's scheduled Meta posts
+      responses:
+        "200":
+          description: Scheduled and published posts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduledPostList"
+    post:
+      operationId: createAdpilotScheduledPost
+      tags: [adpilot]
+      summary: Schedule a photo and caption for selected Meta channels
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScheduledPostInput"
+      responses:
+        "201":
+          description: Post scheduled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduledPost"
+        "422":
+          description: Post details or destinations are invalid
+  /adpilot/posts/{id}:
+    delete:
+      operationId: cancelAdpilotScheduledPost
+      tags: [adpilot]
+      summary: Cancel a post that has not started publishing
+      parameters:
+        - $ref: "#/components/parameters/AdpilotId"
+      responses:
+        "200":
+          description: Post cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "409":
+          description: Publishing has already started
+  /adpilot/oauth/meta/callback:
+    get:
+      operationId: completeAdpilotMetaOAuth
+      tags: [adpilot]
+      summary: Finish Meta authorization and save shared business assets
+      parameters:
+        - name: code
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: error
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Redirect to the workspace connection page
+        "400":
+          description: OAuth state was invalid or expired
+  /meta/data-deletion:
+    post:
+      operationId: receiveMetaDataDeletionRequest
+      tags: [privacy]
+      summary: Verify and process Meta's signed data-deletion request
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                signed_request:
+                  type: string
+                  maxLength: 12000
+              required: [signed_request]
+      responses:
+        "200":
+          description: Deletion receipt and status URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetaDeletionReceipt"
+        "400":
+          description: Signed request was missing or invalid
+  /meta/data-deletion/{code}:
+    get:
+      operationId: getMetaDataDeletionStatus
+      tags: [privacy]
+      summary: Check the completion status of a Meta deletion request
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[a-f0-9]{32}$"
+      responses:
+        "200":
+          description: Deletion request status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetaDeletionStatus"
+        "404":
+          description: Confirmation code not found
   /adpilot/oauth/{provider}/start:
     post:
       operationId: startAdpilotOAuth
@@ -1197,6 +1359,171 @@ components:
           type: string
           format: uri
       required: [url]
+    MetaAsset:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 120
+        name:
+          type: string
+          maxLength: 180
+      required: [id, name]
+    MetaConnectionStatus:
+      type: object
+      properties:
+        connected:
+          type: boolean
+        connectedAt:
+          type: [string, "null"]
+          format: date-time
+        facebookPageId:
+          type: [string, "null"]
+        facebookPageName:
+          type: [string, "null"]
+        instagramAccountId:
+          type: [string, "null"]
+        instagramUsername:
+          type: [string, "null"]
+        availableFacebookPages:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetaAsset"
+        availableInstagramAccounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetaAsset"
+      required:
+        - connected
+        - connectedAt
+        - facebookPageId
+        - facebookPageName
+        - instagramAccountId
+        - instagramUsername
+        - availableFacebookPages
+        - availableInstagramAccounts
+    MetaAssetSelectionInput:
+      type: object
+      properties:
+        facebookPageId:
+          type: [string, "null"]
+          maxLength: 120
+        instagramAccountId:
+          type: [string, "null"]
+          maxLength: 120
+      required: [facebookPageId, instagramAccountId]
+      anyOf:
+        - properties:
+            facebookPageId:
+              type: string
+        - properties:
+            instagramAccountId:
+              type: string
+    ScheduledPostInput:
+      type: object
+      properties:
+        caption:
+          type: string
+          minLength: 1
+          maxLength: 2200
+        hashtags:
+          type: string
+          maxLength: 1000
+        assetId:
+          type: string
+          pattern: "^[a-f0-9]{32}$"
+        scheduledAt:
+          type: string
+          format: date-time
+        platforms:
+          type: array
+          minItems: 1
+          maxItems: 2
+          uniqueItems: true
+          items:
+            type: string
+            enum: [facebook, instagram]
+      required: [caption, hashtags, assetId, scheduledAt, platforms]
+    ScheduledPost:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [scheduled, publishing, published, needs_attention, cancelled]
+        caption:
+          type: string
+        hashtags:
+          type: string
+        assetId:
+          type: string
+        imageUrl:
+          type: string
+        scheduledAt:
+          type: string
+          format: date-time
+        platforms:
+          type: array
+          items:
+            type: string
+            enum: [facebook, instagram]
+        facebookState:
+          type: [string, "null"]
+        instagramState:
+          type: [string, "null"]
+        facebookRemoteId:
+          type: [string, "null"]
+        instagramRemoteId:
+          type: [string, "null"]
+        error:
+          type: [string, "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - status
+        - caption
+        - hashtags
+        - assetId
+        - imageUrl
+        - scheduledAt
+        - platforms
+        - facebookState
+        - instagramState
+        - facebookRemoteId
+        - instagramRemoteId
+        - error
+        - createdAt
+    ScheduledPostList:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScheduledPost"
+      required: [posts]
+    MetaDeletionReceipt:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        confirmation_code:
+          type: string
+          pattern: "^[a-f0-9]{32}$"
+      required: [url, confirmation_code]
+    MetaDeletionStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [completed]
+        requestedAt:
+          type: string
+          format: date-time
+      required: [status, requestedAt]
     AdminAccount:
       type: object
       properties:
