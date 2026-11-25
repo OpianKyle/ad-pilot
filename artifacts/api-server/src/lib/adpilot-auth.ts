@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import type { AppSession } from "./mysql";
+import type { RowDataPacket } from "mysql2/promise";
 import {
   currentUserForSession,
   getMysqlPool,
@@ -48,7 +49,10 @@ export async function getAdpilotContext(
     }
     const isPlatformOwner = isPlatformOwnerEmail(user.email);
     const [rows] = await getMysqlPool().execute<
-      Array<{ status: "pending" | "active" | "suspended"; monthlyGenerationLimit: number }>
+      (RowDataPacket & {
+        status: "pending" | "active" | "suspended";
+        monthlyGenerationLimit: number;
+      })[]
     >(
       `SELECT status, monthly_generation_limit AS monthlyGenerationLimit
        FROM adpilot_business_access WHERE business_id = ? LIMIT 1`,
