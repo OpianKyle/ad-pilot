@@ -119,11 +119,24 @@ export async function requireAdpilotCsrf(
 }
 
 export function publicBaseUrl(): string | null {
-  const value = process.env.ADPILOT_PUBLIC_URL?.trim();
+  const configured = process.env.ADPILOT_PUBLIC_URL?.trim();
+  const replitDomain =
+    process.env.REPLIT_DOMAINS?.split(",").map((domain) => domain.trim()).find(Boolean) ??
+    process.env.REPLIT_DEV_DOMAIN?.trim();
+  const value = configured || (replitDomain ? `https://${replitDomain}` : "");
   if (!value) return null;
   try {
     const url = new URL(value);
-    if (url.protocol !== "https:" || url.username || url.password) return null;
+    if (
+      url.protocol !== "https:" ||
+      url.username ||
+      url.password ||
+      url.pathname !== "/" ||
+      url.search ||
+      url.hash
+    ) {
+      return null;
+    }
     return url.origin;
   } catch {
     return null;

@@ -101,6 +101,37 @@ const statements = [
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY idx_adpilot_oauth_expiry (expires_at)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+  `CREATE TABLE IF NOT EXISTS adpilot_meta_identities (
+    business_id BIGINT UNSIGNED NOT NULL PRIMARY KEY,
+    meta_user_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+    connected_at DATETIME NOT NULL,
+    KEY idx_adpilot_meta_user_hash (meta_user_hash)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+  `CREATE TABLE IF NOT EXISTS adpilot_meta_posts (
+    id CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY,
+    business_id BIGINT UNSIGNED NOT NULL,
+    caption VARCHAR(2200) NOT NULL,
+    hashtags VARCHAR(1000) NOT NULL DEFAULT '',
+    asset_id CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+    scheduled_at DATETIME NOT NULL,
+    platforms JSON NOT NULL,
+    status ENUM('scheduled','publishing','published','needs_attention','cancelled') NOT NULL DEFAULT 'scheduled',
+    facebook_state VARCHAR(32) NULL,
+    instagram_state VARCHAR(32) NULL,
+    facebook_remote_id VARCHAR(255) NULL,
+    instagram_remote_id VARCHAR(255) NULL,
+    error TEXT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_adpilot_meta_posts_queue (status, scheduled_at),
+    KEY idx_adpilot_meta_posts_business (business_id, created_at),
+    KEY idx_adpilot_meta_posts_asset (business_id, asset_id)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+  `CREATE TABLE IF NOT EXISTS adpilot_meta_deletion_requests (
+    code_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY,
+    requested_at DATETIME NOT NULL,
+    KEY idx_adpilot_meta_deletion_requested (requested_at)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
   `CREATE TABLE IF NOT EXISTS adpilot_password_resets (
     token_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
