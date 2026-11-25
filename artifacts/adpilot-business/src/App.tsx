@@ -15,6 +15,7 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
+import PreviewWorkspace from '@/pages/preview-workspace';
 import {
   ArrowDownRight,
   ArrowRight,
@@ -193,6 +194,7 @@ function Unauthenticated({ currentError }: { currentError: string | null }) {
         <div className="mt-8 flex flex-wrap gap-3">
           <Link href="/login" className="button-primary" data-testid="link-start-sign-in">Sign in <ArrowRight size={16} /></Link>
           <Link href="/register" className="button-secondary" data-testid="link-create-account">Create an account</Link>
+          <Link href="/preview" className="button-secondary" data-testid="link-workspace-preview">Explore the workspace preview <ArrowRight size={15} /></Link>
         </div>
       </div>
       <div className="mt-16 grid max-w-[940px] grid-cols-1 gap-3 border-t border-[#e1dbcf] pt-6 sm:grid-cols-3">
@@ -478,7 +480,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-          <AppFrame />
+          <Switch>
+            <Route path="/preview"><PreviewWorkspace /></Route>
+            <Route component={AppFrame} />
+          </Switch>
         </WouterRouter>
         <Toaster />
       </TooltipProvider>
