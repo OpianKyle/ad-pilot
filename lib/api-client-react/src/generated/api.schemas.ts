@@ -21,12 +21,22 @@ export const UserRole = {
   member: 'member',
 } as const;
 
+export type UserWorkspaceStatus = typeof UserWorkspaceStatus[keyof typeof UserWorkspaceStatus];
+
+
+export const UserWorkspaceStatus = {
+  pending: 'pending',
+  active: 'active',
+  suspended: 'suspended',
+} as const;
+
 export interface User {
   id: number;
   businessId: number;
   name: string;
   email: string;
   role: UserRole;
+  workspaceStatus: UserWorkspaceStatus;
 }
 
 export interface AuthResponse {
@@ -109,5 +119,545 @@ export interface DashboardSummary {
   scheduled: number;
   published: number;
   recentCampaigns: Campaign[];
+}
+
+export interface OkResponse {
+  ok: boolean;
+}
+
+export type AdpilotWorkspaceSettingsPlatformsItem = typeof AdpilotWorkspaceSettingsPlatformsItem[keyof typeof AdpilotWorkspaceSettingsPlatformsItem];
+
+
+export const AdpilotWorkspaceSettingsPlatformsItem = {
+  facebook: 'facebook',
+  instagram: 'instagram',
+  linkedin: 'linkedin',
+} as const;
+
+export type AdpilotWorkspaceSettingsCreativeDirection = typeof AdpilotWorkspaceSettingsCreativeDirection[keyof typeof AdpilotWorkspaceSettingsCreativeDirection];
+
+
+export const AdpilotWorkspaceSettingsCreativeDirection = {
+  rotate: 'rotate',
+  editorial: 'editorial',
+  typography: 'typography',
+  detail: 'detail',
+  checklist: 'checklist',
+  question: 'question',
+  offer: 'offer',
+  lifestyle: 'lifestyle',
+  real_photo: 'real_photo',
+  family: 'family',
+  retirement: 'retirement',
+  business: 'business',
+  milestone: 'milestone',
+} as const;
+
+export type AdpilotWorkspaceSettingsImageFormat = typeof AdpilotWorkspaceSettingsImageFormat[keyof typeof AdpilotWorkspaceSettingsImageFormat];
+
+
+export const AdpilotWorkspaceSettingsImageFormat = {
+  square: 'square',
+  portrait: 'portrait',
+  landscape: 'landscape',
+} as const;
+
+export type AdpilotWorkspaceSettingsImageQuality = typeof AdpilotWorkspaceSettingsImageQuality[keyof typeof AdpilotWorkspaceSettingsImageQuality];
+
+
+export const AdpilotWorkspaceSettingsImageQuality = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+export type AdpilotWorkspaceSettingsVisualStyle = typeof AdpilotWorkspaceSettingsVisualStyle[keyof typeof AdpilotWorkspaceSettingsVisualStyle];
+
+
+export const AdpilotWorkspaceSettingsVisualStyle = {
+  natural: 'natural',
+  cinematic: 'cinematic',
+  bright: 'bright',
+  minimal: 'minimal',
+} as const;
+
+export interface AdpilotWorkspaceSettings {
+  /** @maxLength 150 */
+  brand: string;
+  /** @maxLength 1000 */
+  audience: string;
+  /** @maxLength 5000 */
+  facts: string;
+  /** @maxLength 2000 */
+  offer: string;
+  /** @maxLength 300 */
+  voice: string;
+  /** @maxLength 150 */
+  cta: string;
+  destination: string;
+  /** @maxLength 500 */
+  facebookUrl: string;
+  /** @maxLength 500 */
+  instagramUrl: string;
+  /** @maxLength 500 */
+  linkedinUrl: string;
+  /** @maxLength 350 */
+  disclosure: string;
+  /** @maxLength 80 */
+  timezone: string;
+  /** @pattern ^(?:[01][0-9]|2[0-3]):[0-5][0-9]$ */
+  postingTime: string;
+  /**
+     * @minItems 1
+     * @maxItems 3
+     */
+  platforms: AdpilotWorkspaceSettingsPlatformsItem[];
+  creativeDirection: AdpilotWorkspaceSettingsCreativeDirection;
+  /** @pattern ^#[a-fA-F0-9]{6}$ */
+  brandColor: string;
+  imageFormat: AdpilotWorkspaceSettingsImageFormat;
+  imageQuality: AdpilotWorkspaceSettingsImageQuality;
+  visualStyle: AdpilotWorkspaceSettingsVisualStyle;
+  /** @maxLength 1200 */
+  sceneNotes: string;
+  /**
+     * @nullable
+     * @pattern ^[a-f0-9]{32}$
+     */
+  photoAsset: string | null;
+}
+
+export type AdpilotWorkspaceBusinessStatus = typeof AdpilotWorkspaceBusinessStatus[keyof typeof AdpilotWorkspaceBusinessStatus];
+
+
+export const AdpilotWorkspaceBusinessStatus = {
+  pending: 'pending',
+  active: 'active',
+  suspended: 'suspended',
+} as const;
+
+export interface AdpilotWorkspace {
+  settings: AdpilotWorkspaceSettings;
+  businessStatus: AdpilotWorkspaceBusinessStatus;
+  monthlyGenerationLimit: number;
+  generationsUsed: number;
+  isPlatformOwner: boolean;
+}
+
+export type ProviderStatusOauth = {
+  meta: boolean;
+  linkedin: boolean;
+};
+
+export interface ProviderStatus {
+  openai: boolean;
+  facebook: boolean;
+  instagram: boolean;
+  linkedin: boolean;
+  metaAds: boolean;
+  oauth: ProviderStatusOauth;
+  publicUrl: boolean;
+}
+
+export interface ProviderCredentialsInput {
+  /** @maxLength 500 */
+  openaiApiKey?: string;
+  /** @maxLength 4000 */
+  metaPageAccessToken?: string;
+  /** @maxLength 80 */
+  facebookPageId?: string;
+  /** @maxLength 20 */
+  metaGraphVersion?: string;
+  /** @maxLength 80 */
+  instagramAccountId?: string;
+  /** @maxLength 4000 */
+  linkedInAccessToken?: string;
+  /** @maxLength 80 */
+  linkedInOrganizationId?: string;
+  /** @maxLength 10 */
+  linkedInVersion?: string;
+  /** @maxLength 80 */
+  metaAdAccountId?: string;
+  /** @maxLength 4000 */
+  metaAdAccessToken?: string;
+}
+
+export type MediaUploadInputContentType = typeof MediaUploadInputContentType[keyof typeof MediaUploadInputContentType];
+
+
+export const MediaUploadInputContentType = {
+  'image/jpeg': 'image/jpeg',
+  'image/png': 'image/png',
+} as const;
+
+export interface MediaUploadInput {
+  /**
+     * @minLength 1
+     * @maxLength 180
+     */
+  name: string;
+  /**
+     * @minimum 1
+     * @maximum 5242880
+     */
+  size: number;
+  contentType: MediaUploadInputContentType;
+}
+
+export interface MediaUploadResponse {
+  id: string;
+  uploadUrl: string;
+  objectPath: string;
+}
+
+export interface MediaCompleteInput {
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  title: string;
+  rightsConfirmed: boolean;
+}
+
+export interface MediaAsset {
+  id: string;
+  title: string;
+  imageUrl: string;
+  createdAt: string;
+}
+
+export interface MediaList {
+  assets: MediaAsset[];
+}
+
+export type CreativeCreateInputImageFormat = typeof CreativeCreateInputImageFormat[keyof typeof CreativeCreateInputImageFormat];
+
+
+export const CreativeCreateInputImageFormat = {
+  square: 'square',
+  portrait: 'portrait',
+  landscape: 'landscape',
+} as const;
+
+export type CreativeCreateInputImageQuality = typeof CreativeCreateInputImageQuality[keyof typeof CreativeCreateInputImageQuality];
+
+
+export const CreativeCreateInputImageQuality = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+export type CreativeCreateInputVisualStyle = typeof CreativeCreateInputVisualStyle[keyof typeof CreativeCreateInputVisualStyle];
+
+
+export const CreativeCreateInputVisualStyle = {
+  natural: 'natural',
+  cinematic: 'cinematic',
+  bright: 'bright',
+  minimal: 'minimal',
+} as const;
+
+export interface CreativeCreateInput {
+  /**
+     * @minimum 1
+     * @maximum 4
+     */
+  variations?: number;
+  /**
+     * @nullable
+     * @pattern ^[a-f0-9]{32}$
+     */
+  briefId?: string | null;
+  /** @maxLength 30 */
+  direction?: string;
+  imageFormat?: CreativeCreateInputImageFormat;
+  imageQuality?: CreativeCreateInputImageQuality;
+  visualStyle?: CreativeCreateInputVisualStyle;
+  /** @maxLength 1200 */
+  sceneNotes?: string;
+  /**
+     * @nullable
+     * @pattern ^[a-f0-9]{32}$
+     */
+  photoAsset?: string | null;
+}
+
+export interface CreativeEditInput {
+  /** @maxLength 75 */
+  headline?: string;
+  /** @maxLength 1800 */
+  facebook?: string;
+  /** @maxLength 2200 */
+  instagram?: string;
+  /** @maxLength 2900 */
+  linkedin?: string;
+  /** @maxLength 1000 */
+  altText?: string;
+}
+
+export interface CreativeContent {
+  headline?: string;
+  facebook?: string;
+  instagram?: string;
+  linkedin?: string;
+  altText?: string;
+  direction?: string;
+  directionLabel?: string;
+  imageFormat?: string;
+  [key: string]: unknown;
+ }
+
+export type CreativeStatus = typeof CreativeStatus[keyof typeof CreativeStatus];
+
+
+export const CreativeStatus = {
+  queued: 'queued',
+  generating: 'generating',
+  ready: 'ready',
+  scheduled: 'scheduled',
+  publishing: 'publishing',
+  published: 'published',
+  needs_attention: 'needs_attention',
+  failed: 'failed',
+  archived: 'archived',
+  cancelled: 'cancelled',
+  held: 'held',
+} as const;
+
+export type DeliveryPlatform = typeof DeliveryPlatform[keyof typeof DeliveryPlatform];
+
+
+export const DeliveryPlatform = {
+  facebook: 'facebook',
+  instagram: 'instagram',
+  linkedin: 'linkedin',
+} as const;
+
+export interface Delivery {
+  platform: DeliveryPlatform;
+  state: string;
+  /** @nullable */
+  remoteId: string | null;
+  /** @nullable */
+  error: string | null;
+}
+
+export interface Creative {
+  id: string;
+  status: CreativeStatus;
+  content: CreativeContent | null;
+  /** @nullable */
+  imageUrl: string | null;
+  /** @nullable */
+  error: string | null;
+  /** @nullable */
+  scheduledAt: string | null;
+  createdAt: string;
+  deliveries: Delivery[];
+}
+
+export interface CreativeList {
+  creatives: Creative[];
+}
+
+export interface ScheduleInput {
+  scheduledAt: string;
+}
+
+export interface BriefInput {
+  /**
+     * @nullable
+     * @pattern ^[a-f0-9]{32}$
+     */
+  id?: string | null;
+  /**
+     * @minLength 2
+     * @maxLength 150
+     */
+  name: string;
+  settings: AdpilotWorkspaceSettings;
+}
+
+export interface Brief {
+  id: string;
+  name: string;
+  settings: AdpilotWorkspaceSettings;
+  dailyEnabled: boolean;
+  createdAt: string;
+}
+
+export interface BriefList {
+  briefs: Brief[];
+}
+
+export interface AutopilotInput {
+  enabled: boolean;
+}
+
+export type ConnectionVerificationAccounts = {[key: string]: string};
+
+export interface ConnectionVerification {
+  accounts: ConnectionVerificationAccounts;
+}
+
+export interface OAuthStartResponse {
+  url: string;
+}
+
+export type AdminAccountStatus = typeof AdminAccountStatus[keyof typeof AdminAccountStatus];
+
+
+export const AdminAccountStatus = {
+  pending: 'pending',
+  active: 'active',
+  suspended: 'suspended',
+} as const;
+
+export interface AdminAccount {
+  businessId: number;
+  businessName: string;
+  ownerName: string;
+  email: string;
+  status: AdminAccountStatus;
+  plan: string;
+  monthlyGenerationLimit: number;
+  generationsUsed: number;
+  creativeCount: number;
+  publishedCount: number;
+  attentionCount: number;
+  paidActiveCount: number;
+  connections: ProviderStatus;
+}
+
+export interface AdminAccountList {
+  accounts: AdminAccount[];
+}
+
+export type AdminAccountUpdateStatus = typeof AdminAccountUpdateStatus[keyof typeof AdminAccountUpdateStatus];
+
+
+export const AdminAccountUpdateStatus = {
+  pending: 'pending',
+  active: 'active',
+  suspended: 'suspended',
+} as const;
+
+export interface AdminAccountUpdate {
+  status?: AdminAccountUpdateStatus;
+  /** @maxLength 80 */
+  plan?: string;
+  /**
+     * @minimum 0
+     * @maximum 100000
+     */
+  monthlyGenerationLimit?: number;
+}
+
+export interface PasswordResetLink {
+  url: string;
+  expiresAt: string;
+}
+
+export interface DashboardActivity {
+  message: string;
+  createdAt: string;
+}
+
+export type AdpilotDashboardBusinessStatus = typeof AdpilotDashboardBusinessStatus[keyof typeof AdpilotDashboardBusinessStatus];
+
+
+export const AdpilotDashboardBusinessStatus = {
+  pending: 'pending',
+  active: 'active',
+  suspended: 'suspended',
+} as const;
+
+export interface AdpilotDashboard {
+  businessStatus: AdpilotDashboardBusinessStatus;
+  monthlyGenerationLimit: number;
+  generationsUsed: number;
+  creativeCount: number;
+  readyCount: number;
+  publishedCount: number;
+  attentionCount: number;
+  paidActiveCount: number;
+  activities: DashboardActivity[];
+}
+
+export type PaidCampaignInputSpecialAdCategoriesItem = typeof PaidCampaignInputSpecialAdCategoriesItem[keyof typeof PaidCampaignInputSpecialAdCategoriesItem];
+
+
+export const PaidCampaignInputSpecialAdCategoriesItem = {
+  FINANCIAL_PRODUCTS_SERVICES: 'FINANCIAL_PRODUCTS_SERVICES',
+  CREDIT: 'CREDIT',
+  HOUSING: 'HOUSING',
+  EMPLOYMENT: 'EMPLOYMENT',
+  ISSUES_ELECTIONS_POLITICS: 'ISSUES_ELECTIONS_POLITICS',
+  ONLINE_GAMBLING_AND_GAMING: 'ONLINE_GAMBLING_AND_GAMING',
+} as const;
+
+export interface PaidCampaignInput {
+  /**
+     * @minLength 1
+     * @maxLength 150
+     */
+  name: string;
+  /** @pattern ^[a-f0-9]{32}$ */
+  creativeId: string;
+  /**
+     * @minimum 1
+     * @maximum 10000
+     */
+  dailyZar: number;
+  /**
+     * @minItems 1
+     * @maxItems 10
+     * @items.pattern ^[A-Z]{2}$
+     */
+  countries: string[];
+  start: string;
+  end: string;
+  specialAdCategories: PaidCampaignInputSpecialAdCategoriesItem[];
+  categoryConfirmed: boolean;
+}
+
+export interface PaidCampaignAction {
+  spendConfirmed?: boolean;
+  displayedDailyZar?: number;
+}
+
+export type PaidCampaignState = typeof PaidCampaignState[keyof typeof PaidCampaignState];
+
+
+export const PaidCampaignState = {
+  draft: 'draft',
+  creating: 'creating',
+  paused: 'paused',
+  launching: 'launching',
+  active: 'active',
+  needs_attention: 'needs_attention',
+  ended: 'ended',
+} as const;
+
+/**
+ * @nullable
+ */
+export type PaidCampaignMetrics = { [key: string]: unknown } | null;
+
+export interface PaidCampaign {
+  id: string;
+  name: string;
+  state: PaidCampaignState;
+  plan: PaidCampaignInput;
+  /** @nullable */
+  metrics: PaidCampaignMetrics;
+  /** @nullable */
+  error: string | null;
+  updatedAt: string;
+}
+
+export interface PaidCampaignList {
+  campaigns: PaidCampaign[];
 }
 

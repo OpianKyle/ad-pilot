@@ -25,16 +25,45 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminAccountList,
+  AdminAccountUpdate,
+  AdpilotDashboard,
+  AdpilotWorkspace,
+  AdpilotWorkspaceSettings,
   AuthResponse,
+  AutopilotInput,
+  Brief,
+  BriefInput,
+  BriefList,
   Campaign,
   CampaignInput,
   CampaignList,
+  ConnectionVerification,
+  Creative,
+  CreativeCreateInput,
+  CreativeEditInput,
+  CreativeList,
   CsrfToken,
   DashboardSummary,
   HealthStatus,
   LoginInput,
   LogoutResponse,
-  RegistrationInput
+  MediaAsset,
+  MediaCompleteInput,
+  MediaList,
+  MediaUploadInput,
+  MediaUploadResponse,
+  OAuthStartResponse,
+  OkResponse,
+  PaidCampaign,
+  PaidCampaignAction,
+  PaidCampaignInput,
+  PaidCampaignList,
+  PasswordResetLink,
+  ProviderCredentialsInput,
+  ProviderStatus,
+  RegistrationInput,
+  ScheduleInput
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -906,5 +935,2760 @@ export const useCreateCampaign = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getCreateCampaignMutationOptions(options), queryClient);
+    }
+
+export const getGetAdpilotWorkspaceUrl = () => {
+
+
+
+
+  return `/api/adpilot/workspace`
+}
+
+/**
+ * @summary Get workspace settings and account limits
+ */
+export const getAdpilotWorkspace = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdpilotWorkspace> => {
+
+  return customFetch<AdpilotWorkspace>(getGetAdpilotWorkspaceUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdpilotWorkspaceQueryKey = () => {
+    return [
+    `/api/adpilot/workspace`
+    ] as const;
+    }
+
+
+export const getGetAdpilotWorkspaceQueryOptions = <TData = Awaited<ReturnType<typeof getAdpilotWorkspace>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotWorkspace>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdpilotWorkspaceQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdpilotWorkspace>>> = ({ signal }) => getAdpilotWorkspace({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdpilotWorkspace>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAdpilotWorkspaceQueryResult = NonNullable<Awaited<ReturnType<typeof getAdpilotWorkspace>>>
+export type GetAdpilotWorkspaceQueryError = ErrorType<void>
+
+
+export function useGetAdpilotWorkspace<TData = Awaited<ReturnType<typeof getAdpilotWorkspace>>, TError = ErrorType<void>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotWorkspace>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdpilotWorkspace>>,
+          TError,
+          Awaited<ReturnType<typeof getAdpilotWorkspace>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdpilotWorkspace<TData = Awaited<ReturnType<typeof getAdpilotWorkspace>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotWorkspace>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdpilotWorkspace>>,
+          TError,
+          Awaited<ReturnType<typeof getAdpilotWorkspace>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdpilotWorkspace<TData = Awaited<ReturnType<typeof getAdpilotWorkspace>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotWorkspace>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get workspace settings and account limits
+ */
+
+export function useGetAdpilotWorkspace<TData = Awaited<ReturnType<typeof getAdpilotWorkspace>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotWorkspace>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAdpilotWorkspaceQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSaveAdpilotWorkspaceUrl = () => {
+
+
+
+
+  return `/api/adpilot/workspace`
+}
+
+/**
+ * @summary Save brand, channel, and generation defaults
+ */
+export const saveAdpilotWorkspace = async (adpilotWorkspaceSettings: AdpilotWorkspaceSettings, options?: Parameters<typeof customFetch>[1]): Promise<OkResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<OkResponse>(getSaveAdpilotWorkspaceUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adpilotWorkspaceSettings)
+  }
+);}
+
+
+
+
+
+export const getSaveAdpilotWorkspaceMutationKey = () => ['saveAdpilotWorkspace'] as const;
+
+export const getSaveAdpilotWorkspaceMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveAdpilotWorkspace>>, TError,SaveAdpilotWorkspaceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveAdpilotWorkspace>>, TError,SaveAdpilotWorkspaceMutationVariables, TContext> => {
+
+const mutationKey = getSaveAdpilotWorkspaceMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveAdpilotWorkspace>>, SaveAdpilotWorkspaceMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  saveAdpilotWorkspace(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveAdpilotWorkspaceMutationResult = NonNullable<Awaited<ReturnType<typeof saveAdpilotWorkspace>>>
+    export type SaveAdpilotWorkspaceMutationBody = BodyType<AdpilotWorkspaceSettings>
+    export type SaveAdpilotWorkspaceMutationError = ErrorType<void>
+    export type SaveAdpilotWorkspaceMutationVariables = {data: BodyType<AdpilotWorkspaceSettings>}
+
+    /**
+ * @summary Save brand, channel, and generation defaults
+ */
+export const useSaveAdpilotWorkspace = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveAdpilotWorkspace>>, TError,SaveAdpilotWorkspaceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof saveAdpilotWorkspace>>,
+        TError,
+        SaveAdpilotWorkspaceMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSaveAdpilotWorkspaceMutationOptions(options), queryClient);
+    }
+
+export const getGetAdpilotCredentialsUrl = () => {
+
+
+
+
+  return `/api/adpilot/credentials`
+}
+
+/**
+ * @summary Get provider connection status without secrets
+ */
+export const getAdpilotCredentials = async ( options?: Parameters<typeof customFetch>[1]): Promise<ProviderStatus> => {
+
+  return customFetch<ProviderStatus>(getGetAdpilotCredentialsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdpilotCredentialsQueryKey = () => {
+    return [
+    `/api/adpilot/credentials`
+    ] as const;
+    }
+
+
+export const getGetAdpilotCredentialsQueryOptions = <TData = Awaited<ReturnType<typeof getAdpilotCredentials>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotCredentials>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdpilotCredentialsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdpilotCredentials>>> = ({ signal }) => getAdpilotCredentials({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdpilotCredentials>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAdpilotCredentialsQueryResult = NonNullable<Awaited<ReturnType<typeof getAdpilotCredentials>>>
+export type GetAdpilotCredentialsQueryError = ErrorType<unknown>
+
+
+export function useGetAdpilotCredentials<TData = Awaited<ReturnType<typeof getAdpilotCredentials>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotCredentials>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdpilotCredentials>>,
+          TError,
+          Awaited<ReturnType<typeof getAdpilotCredentials>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdpilotCredentials<TData = Awaited<ReturnType<typeof getAdpilotCredentials>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotCredentials>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdpilotCredentials>>,
+          TError,
+          Awaited<ReturnType<typeof getAdpilotCredentials>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdpilotCredentials<TData = Awaited<ReturnType<typeof getAdpilotCredentials>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotCredentials>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get provider connection status without secrets
+ */
+
+export function useGetAdpilotCredentials<TData = Awaited<ReturnType<typeof getAdpilotCredentials>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotCredentials>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAdpilotCredentialsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSaveAdpilotCredentialsUrl = () => {
+
+
+
+
+  return `/api/adpilot/credentials`
+}
+
+/**
+ * @summary Save encrypted provider credentials
+ */
+export const saveAdpilotCredentials = async (providerCredentialsInput: ProviderCredentialsInput, options?: Parameters<typeof customFetch>[1]): Promise<ProviderStatus> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ProviderStatus>(getSaveAdpilotCredentialsUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(providerCredentialsInput)
+  }
+);}
+
+
+
+
+
+export const getSaveAdpilotCredentialsMutationKey = () => ['saveAdpilotCredentials'] as const;
+
+export const getSaveAdpilotCredentialsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveAdpilotCredentials>>, TError,SaveAdpilotCredentialsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveAdpilotCredentials>>, TError,SaveAdpilotCredentialsMutationVariables, TContext> => {
+
+const mutationKey = getSaveAdpilotCredentialsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveAdpilotCredentials>>, SaveAdpilotCredentialsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  saveAdpilotCredentials(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveAdpilotCredentialsMutationResult = NonNullable<Awaited<ReturnType<typeof saveAdpilotCredentials>>>
+    export type SaveAdpilotCredentialsMutationBody = BodyType<ProviderCredentialsInput>
+    export type SaveAdpilotCredentialsMutationError = ErrorType<unknown>
+    export type SaveAdpilotCredentialsMutationVariables = {data: BodyType<ProviderCredentialsInput>}
+
+    /**
+ * @summary Save encrypted provider credentials
+ */
+export const useSaveAdpilotCredentials = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveAdpilotCredentials>>, TError,SaveAdpilotCredentialsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof saveAdpilotCredentials>>,
+        TError,
+        SaveAdpilotCredentialsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSaveAdpilotCredentialsMutationOptions(options), queryClient);
+    }
+
+export const getListAdpilotAssetsUrl = () => {
+
+
+
+
+  return `/api/adpilot/assets`
+}
+
+/**
+ * @summary List workspace photographs
+ */
+export const listAdpilotAssets = async ( options?: Parameters<typeof customFetch>[1]): Promise<MediaList> => {
+
+  return customFetch<MediaList>(getListAdpilotAssetsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdpilotAssetsQueryKey = () => {
+    return [
+    `/api/adpilot/assets`
+    ] as const;
+    }
+
+
+export const getListAdpilotAssetsQueryOptions = <TData = Awaited<ReturnType<typeof listAdpilotAssets>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotAssets>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdpilotAssetsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdpilotAssets>>> = ({ signal }) => listAdpilotAssets({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdpilotAssets>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAdpilotAssetsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdpilotAssets>>>
+export type ListAdpilotAssetsQueryError = ErrorType<unknown>
+
+
+export function useListAdpilotAssets<TData = Awaited<ReturnType<typeof listAdpilotAssets>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotAssets>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdpilotAssets>>,
+          TError,
+          Awaited<ReturnType<typeof listAdpilotAssets>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdpilotAssets<TData = Awaited<ReturnType<typeof listAdpilotAssets>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotAssets>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdpilotAssets>>,
+          TError,
+          Awaited<ReturnType<typeof listAdpilotAssets>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdpilotAssets<TData = Awaited<ReturnType<typeof listAdpilotAssets>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotAssets>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List workspace photographs
+ */
+
+export function useListAdpilotAssets<TData = Awaited<ReturnType<typeof listAdpilotAssets>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotAssets>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAdpilotAssetsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRequestAdpilotAssetUploadUrl = () => {
+
+
+
+
+  return `/api/adpilot/assets/upload-url`
+}
+
+/**
+ * @summary Request a private direct-upload URL
+ */
+export const requestAdpilotAssetUpload = async (mediaUploadInput: MediaUploadInput, options?: Parameters<typeof customFetch>[1]): Promise<MediaUploadResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<MediaUploadResponse>(getRequestAdpilotAssetUploadUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(mediaUploadInput)
+  }
+);}
+
+
+
+
+
+export const getRequestAdpilotAssetUploadMutationKey = () => ['requestAdpilotAssetUpload'] as const;
+
+export const getRequestAdpilotAssetUploadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestAdpilotAssetUpload>>, TError,RequestAdpilotAssetUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestAdpilotAssetUpload>>, TError,RequestAdpilotAssetUploadMutationVariables, TContext> => {
+
+const mutationKey = getRequestAdpilotAssetUploadMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestAdpilotAssetUpload>>, RequestAdpilotAssetUploadMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestAdpilotAssetUpload(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestAdpilotAssetUploadMutationResult = NonNullable<Awaited<ReturnType<typeof requestAdpilotAssetUpload>>>
+    export type RequestAdpilotAssetUploadMutationBody = BodyType<MediaUploadInput>
+    export type RequestAdpilotAssetUploadMutationError = ErrorType<unknown>
+    export type RequestAdpilotAssetUploadMutationVariables = {data: BodyType<MediaUploadInput>}
+
+    /**
+ * @summary Request a private direct-upload URL
+ */
+export const useRequestAdpilotAssetUpload = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestAdpilotAssetUpload>>, TError,RequestAdpilotAssetUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof requestAdpilotAssetUpload>>,
+        TError,
+        RequestAdpilotAssetUploadMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRequestAdpilotAssetUploadMutationOptions(options), queryClient);
+    }
+
+export const getCompleteAdpilotAssetUploadUrl = (id: string,) => {
+
+
+
+
+  return `/api/adpilot/assets/${id}/complete`
+}
+
+/**
+ * @summary Validate and finalize a photograph upload
+ */
+export const completeAdpilotAssetUpload = async (id: string,
+    mediaCompleteInput: MediaCompleteInput, options?: Parameters<typeof customFetch>[1]): Promise<MediaAsset> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<MediaAsset>(getCompleteAdpilotAssetUploadUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(mediaCompleteInput)
+  }
+);}
+
+
+
+
+
+export const getCompleteAdpilotAssetUploadMutationKey = () => ['completeAdpilotAssetUpload'] as const;
+
+export const getCompleteAdpilotAssetUploadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeAdpilotAssetUpload>>, TError,CompleteAdpilotAssetUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof completeAdpilotAssetUpload>>, TError,CompleteAdpilotAssetUploadMutationVariables, TContext> => {
+
+const mutationKey = getCompleteAdpilotAssetUploadMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof completeAdpilotAssetUpload>>, CompleteAdpilotAssetUploadMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  completeAdpilotAssetUpload(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompleteAdpilotAssetUploadMutationResult = NonNullable<Awaited<ReturnType<typeof completeAdpilotAssetUpload>>>
+    export type CompleteAdpilotAssetUploadMutationBody = BodyType<MediaCompleteInput>
+    export type CompleteAdpilotAssetUploadMutationError = ErrorType<unknown>
+    export type CompleteAdpilotAssetUploadMutationVariables = {id: string;data: BodyType<MediaCompleteInput>}
+
+    /**
+ * @summary Validate and finalize a photograph upload
+ */
+export const useCompleteAdpilotAssetUpload = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeAdpilotAssetUpload>>, TError,CompleteAdpilotAssetUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof completeAdpilotAssetUpload>>,
+        TError,
+        CompleteAdpilotAssetUploadMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCompleteAdpilotAssetUploadMutationOptions(options), queryClient);
+    }
+
+export const getGetAdpilotAssetContentUrl = (id: string,) => {
+
+
+
+
+  return `/api/adpilot/assets/${id}/content`
+}
+
+/**
+ * @summary View a photograph belonging to the current workspace
+ */
+export const getAdpilotAssetContent = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetAdpilotAssetContentUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdpilotAssetContentQueryKey = (id: string,) => {
+    return [
+    `/api/adpilot/assets/${id}/content`
+    ] as const;
+    }
+
+
+export const getGetAdpilotAssetContentQueryOptions = <TData = Awaited<ReturnType<typeof getAdpilotAssetContent>>, TError = ErrorType<void>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotAssetContent>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdpilotAssetContentQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdpilotAssetContent>>> = ({ signal }) => getAdpilotAssetContent(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdpilotAssetContent>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAdpilotAssetContentQueryResult = NonNullable<Awaited<ReturnType<typeof getAdpilotAssetContent>>>
+export type GetAdpilotAssetContentQueryError = ErrorType<void>
+
+
+export function useGetAdpilotAssetContent<TData = Awaited<ReturnType<typeof getAdpilotAssetContent>>, TError = ErrorType<void>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotAssetContent>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdpilotAssetContent>>,
+          TError,
+          Awaited<ReturnType<typeof getAdpilotAssetContent>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdpilotAssetContent<TData = Awaited<ReturnType<typeof getAdpilotAssetContent>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotAssetContent>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdpilotAssetContent>>,
+          TError,
+          Awaited<ReturnType<typeof getAdpilotAssetContent>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdpilotAssetContent<TData = Awaited<ReturnType<typeof getAdpilotAssetContent>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotAssetContent>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary View a photograph belonging to the current workspace
+ */
+
+export function useGetAdpilotAssetContent<TData = Awaited<ReturnType<typeof getAdpilotAssetContent>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotAssetContent>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAdpilotAssetContentQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDeleteAdpilotAssetUrl = (id: string,) => {
+
+
+
+
+  return `/api/adpilot/assets/${id}`
+}
+
+/**
+ * @summary Remove an unused workspace photograph
+ */
+export const deleteAdpilotAsset = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getDeleteAdpilotAssetUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteAdpilotAssetMutationKey = () => ['deleteAdpilotAsset'] as const;
+
+export const getDeleteAdpilotAssetMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdpilotAsset>>, TError,DeleteAdpilotAssetMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAdpilotAsset>>, TError,DeleteAdpilotAssetMutationVariables, TContext> => {
+
+const mutationKey = getDeleteAdpilotAssetMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAdpilotAsset>>, DeleteAdpilotAssetMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteAdpilotAsset(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAdpilotAssetMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAdpilotAsset>>>
+
+    export type DeleteAdpilotAssetMutationError = ErrorType<unknown>
+    export type DeleteAdpilotAssetMutationVariables = {id: string}
+
+    /**
+ * @summary Remove an unused workspace photograph
+ */
+export const useDeleteAdpilotAsset = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdpilotAsset>>, TError,DeleteAdpilotAssetMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAdpilotAsset>>,
+        TError,
+        DeleteAdpilotAssetMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteAdpilotAssetMutationOptions(options), queryClient);
+    }
+
+export const getListAdpilotBriefsUrl = () => {
+
+
+
+
+  return `/api/adpilot/briefs`
+}
+
+/**
+ * @summary List saved campaign briefs
+ */
+export const listAdpilotBriefs = async ( options?: Parameters<typeof customFetch>[1]): Promise<BriefList> => {
+
+  return customFetch<BriefList>(getListAdpilotBriefsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdpilotBriefsQueryKey = () => {
+    return [
+    `/api/adpilot/briefs`
+    ] as const;
+    }
+
+
+export const getListAdpilotBriefsQueryOptions = <TData = Awaited<ReturnType<typeof listAdpilotBriefs>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotBriefs>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdpilotBriefsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdpilotBriefs>>> = ({ signal }) => listAdpilotBriefs({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdpilotBriefs>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAdpilotBriefsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdpilotBriefs>>>
+export type ListAdpilotBriefsQueryError = ErrorType<unknown>
+
+
+export function useListAdpilotBriefs<TData = Awaited<ReturnType<typeof listAdpilotBriefs>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotBriefs>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdpilotBriefs>>,
+          TError,
+          Awaited<ReturnType<typeof listAdpilotBriefs>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdpilotBriefs<TData = Awaited<ReturnType<typeof listAdpilotBriefs>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotBriefs>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdpilotBriefs>>,
+          TError,
+          Awaited<ReturnType<typeof listAdpilotBriefs>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdpilotBriefs<TData = Awaited<ReturnType<typeof listAdpilotBriefs>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotBriefs>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List saved campaign briefs
+ */
+
+export function useListAdpilotBriefs<TData = Awaited<ReturnType<typeof listAdpilotBriefs>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotBriefs>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAdpilotBriefsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateAdpilotBriefUrl = () => {
+
+
+
+
+  return `/api/adpilot/briefs`
+}
+
+/**
+ * @summary Save a campaign brief
+ */
+export const createAdpilotBrief = async (briefInput: BriefInput, options?: Parameters<typeof customFetch>[1]): Promise<Brief> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<Brief>(getCreateAdpilotBriefUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(briefInput)
+  }
+);}
+
+
+
+
+
+export const getCreateAdpilotBriefMutationKey = () => ['createAdpilotBrief'] as const;
+
+export const getCreateAdpilotBriefMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdpilotBrief>>, TError,CreateAdpilotBriefMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdpilotBrief>>, TError,CreateAdpilotBriefMutationVariables, TContext> => {
+
+const mutationKey = getCreateAdpilotBriefMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdpilotBrief>>, CreateAdpilotBriefMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAdpilotBrief(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdpilotBriefMutationResult = NonNullable<Awaited<ReturnType<typeof createAdpilotBrief>>>
+    export type CreateAdpilotBriefMutationBody = BodyType<BriefInput>
+    export type CreateAdpilotBriefMutationError = ErrorType<unknown>
+    export type CreateAdpilotBriefMutationVariables = {data: BodyType<BriefInput>}
+
+    /**
+ * @summary Save a campaign brief
+ */
+export const useCreateAdpilotBrief = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdpilotBrief>>, TError,CreateAdpilotBriefMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAdpilotBrief>>,
+        TError,
+        CreateAdpilotBriefMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateAdpilotBriefMutationOptions(options), queryClient);
+    }
+
+export const getUpdateAdpilotBriefUrl = (id: string,) => {
+
+
+
+
+  return `/api/adpilot/briefs/${id}`
+}
+
+/**
+ * @summary Update a campaign brief
+ */
+export const updateAdpilotBrief = async (id: string,
+    briefInput: BriefInput, options?: Parameters<typeof customFetch>[1]): Promise<Brief> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<Brief>(getUpdateAdpilotBriefUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(briefInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateAdpilotBriefMutationKey = () => ['updateAdpilotBrief'] as const;
+
+export const getUpdateAdpilotBriefMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdpilotBrief>>, TError,UpdateAdpilotBriefMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdpilotBrief>>, TError,UpdateAdpilotBriefMutationVariables, TContext> => {
+
+const mutationKey = getUpdateAdpilotBriefMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdpilotBrief>>, UpdateAdpilotBriefMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateAdpilotBrief(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdpilotBriefMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdpilotBrief>>>
+    export type UpdateAdpilotBriefMutationBody = BodyType<BriefInput>
+    export type UpdateAdpilotBriefMutationError = ErrorType<unknown>
+    export type UpdateAdpilotBriefMutationVariables = {id: string;data: BodyType<BriefInput>}
+
+    /**
+ * @summary Update a campaign brief
+ */
+export const useUpdateAdpilotBrief = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdpilotBrief>>, TError,UpdateAdpilotBriefMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdpilotBrief>>,
+        TError,
+        UpdateAdpilotBriefMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateAdpilotBriefMutationOptions(options), queryClient);
+    }
+
+export const getDeleteAdpilotBriefUrl = (id: string,) => {
+
+
+
+
+  return `/api/adpilot/briefs/${id}`
+}
+
+/**
+ * @summary Delete a campaign brief
+ */
+export const deleteAdpilotBrief = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getDeleteAdpilotBriefUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteAdpilotBriefMutationKey = () => ['deleteAdpilotBrief'] as const;
+
+export const getDeleteAdpilotBriefMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdpilotBrief>>, TError,DeleteAdpilotBriefMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAdpilotBrief>>, TError,DeleteAdpilotBriefMutationVariables, TContext> => {
+
+const mutationKey = getDeleteAdpilotBriefMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAdpilotBrief>>, DeleteAdpilotBriefMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteAdpilotBrief(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAdpilotBriefMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAdpilotBrief>>>
+
+    export type DeleteAdpilotBriefMutationError = ErrorType<unknown>
+    export type DeleteAdpilotBriefMutationVariables = {id: string}
+
+    /**
+ * @summary Delete a campaign brief
+ */
+export const useDeleteAdpilotBrief = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdpilotBrief>>, TError,DeleteAdpilotBriefMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAdpilotBrief>>,
+        TError,
+        DeleteAdpilotBriefMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteAdpilotBriefMutationOptions(options), queryClient);
+    }
+
+export const getSetAdpilotBriefAutopilotUrl = (id: string,) => {
+
+
+
+
+  return `/api/adpilot/briefs/${id}/autopilot`
+}
+
+/**
+ * @summary Pause or activate daily generation for a brief
+ */
+export const setAdpilotBriefAutopilot = async (id: string,
+    autopilotInput: AutopilotInput, options?: Parameters<typeof customFetch>[1]): Promise<OkResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<OkResponse>(getSetAdpilotBriefAutopilotUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(autopilotInput)
+  }
+);}
+
+
+
+
+
+export const getSetAdpilotBriefAutopilotMutationKey = () => ['setAdpilotBriefAutopilot'] as const;
+
+export const getSetAdpilotBriefAutopilotMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setAdpilotBriefAutopilot>>, TError,SetAdpilotBriefAutopilotMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setAdpilotBriefAutopilot>>, TError,SetAdpilotBriefAutopilotMutationVariables, TContext> => {
+
+const mutationKey = getSetAdpilotBriefAutopilotMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setAdpilotBriefAutopilot>>, SetAdpilotBriefAutopilotMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  setAdpilotBriefAutopilot(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetAdpilotBriefAutopilotMutationResult = NonNullable<Awaited<ReturnType<typeof setAdpilotBriefAutopilot>>>
+    export type SetAdpilotBriefAutopilotMutationBody = BodyType<AutopilotInput>
+    export type SetAdpilotBriefAutopilotMutationError = ErrorType<unknown>
+    export type SetAdpilotBriefAutopilotMutationVariables = {id: string;data: BodyType<AutopilotInput>}
+
+    /**
+ * @summary Pause or activate daily generation for a brief
+ */
+export const useSetAdpilotBriefAutopilot = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setAdpilotBriefAutopilot>>, TError,SetAdpilotBriefAutopilotMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof setAdpilotBriefAutopilot>>,
+        TError,
+        SetAdpilotBriefAutopilotMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSetAdpilotBriefAutopilotMutationOptions(options), queryClient);
+    }
+
+export const getListAdpilotCreativesUrl = () => {
+
+
+
+
+  return `/api/adpilot/creatives`
+}
+
+/**
+ * @summary List generated campaign drafts and delivery state
+ */
+export const listAdpilotCreatives = async ( options?: Parameters<typeof customFetch>[1]): Promise<CreativeList> => {
+
+  return customFetch<CreativeList>(getListAdpilotCreativesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdpilotCreativesQueryKey = () => {
+    return [
+    `/api/adpilot/creatives`
+    ] as const;
+    }
+
+
+export const getListAdpilotCreativesQueryOptions = <TData = Awaited<ReturnType<typeof listAdpilotCreatives>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotCreatives>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdpilotCreativesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdpilotCreatives>>> = ({ signal }) => listAdpilotCreatives({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdpilotCreatives>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAdpilotCreativesQueryResult = NonNullable<Awaited<ReturnType<typeof listAdpilotCreatives>>>
+export type ListAdpilotCreativesQueryError = ErrorType<unknown>
+
+
+export function useListAdpilotCreatives<TData = Awaited<ReturnType<typeof listAdpilotCreatives>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotCreatives>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdpilotCreatives>>,
+          TError,
+          Awaited<ReturnType<typeof listAdpilotCreatives>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdpilotCreatives<TData = Awaited<ReturnType<typeof listAdpilotCreatives>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotCreatives>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdpilotCreatives>>,
+          TError,
+          Awaited<ReturnType<typeof listAdpilotCreatives>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdpilotCreatives<TData = Awaited<ReturnType<typeof listAdpilotCreatives>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotCreatives>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List generated campaign drafts and delivery state
+ */
+
+export function useListAdpilotCreatives<TData = Awaited<ReturnType<typeof listAdpilotCreatives>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotCreatives>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAdpilotCreativesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateAdpilotCreativesUrl = () => {
+
+
+
+
+  return `/api/adpilot/creatives`
+}
+
+/**
+ * @summary Queue one to four AI creative drafts
+ */
+export const createAdpilotCreatives = async (creativeCreateInput: CreativeCreateInput, options?: Parameters<typeof customFetch>[1]): Promise<CreativeList> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<CreativeList>(getCreateAdpilotCreativesUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(creativeCreateInput)
+  }
+);}
+
+
+
+
+
+export const getCreateAdpilotCreativesMutationKey = () => ['createAdpilotCreatives'] as const;
+
+export const getCreateAdpilotCreativesMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdpilotCreatives>>, TError,CreateAdpilotCreativesMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdpilotCreatives>>, TError,CreateAdpilotCreativesMutationVariables, TContext> => {
+
+const mutationKey = getCreateAdpilotCreativesMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdpilotCreatives>>, CreateAdpilotCreativesMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAdpilotCreatives(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdpilotCreativesMutationResult = NonNullable<Awaited<ReturnType<typeof createAdpilotCreatives>>>
+    export type CreateAdpilotCreativesMutationBody = BodyType<CreativeCreateInput>
+    export type CreateAdpilotCreativesMutationError = ErrorType<unknown>
+    export type CreateAdpilotCreativesMutationVariables = {data: BodyType<CreativeCreateInput>}
+
+    /**
+ * @summary Queue one to four AI creative drafts
+ */
+export const useCreateAdpilotCreatives = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdpilotCreatives>>, TError,CreateAdpilotCreativesMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAdpilotCreatives>>,
+        TError,
+        CreateAdpilotCreativesMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateAdpilotCreativesMutationOptions(options), queryClient);
+    }
+
+export const getGetAdpilotCreativeUrl = (id: string,) => {
+
+
+
+
+  return `/api/adpilot/creatives/${id}`
+}
+
+/**
+ * @summary Get one creative from the current workspace
+ */
+export const getAdpilotCreative = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<Creative> => {
+
+  return customFetch<Creative>(getGetAdpilotCreativeUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdpilotCreativeQueryKey = (id: string,) => {
+    return [
+    `/api/adpilot/creatives/${id}`
+    ] as const;
+    }
+
+
+export const getGetAdpilotCreativeQueryOptions = <TData = Awaited<ReturnType<typeof getAdpilotCreative>>, TError = ErrorType<void>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotCreative>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdpilotCreativeQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdpilotCreative>>> = ({ signal }) => getAdpilotCreative(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdpilotCreative>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAdpilotCreativeQueryResult = NonNullable<Awaited<ReturnType<typeof getAdpilotCreative>>>
+export type GetAdpilotCreativeQueryError = ErrorType<void>
+
+
+export function useGetAdpilotCreative<TData = Awaited<ReturnType<typeof getAdpilotCreative>>, TError = ErrorType<void>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotCreative>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdpilotCreative>>,
+          TError,
+          Awaited<ReturnType<typeof getAdpilotCreative>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdpilotCreative<TData = Awaited<ReturnType<typeof getAdpilotCreative>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotCreative>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdpilotCreative>>,
+          TError,
+          Awaited<ReturnType<typeof getAdpilotCreative>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdpilotCreative<TData = Awaited<ReturnType<typeof getAdpilotCreative>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotCreative>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get one creative from the current workspace
+ */
+
+export function useGetAdpilotCreative<TData = Awaited<ReturnType<typeof getAdpilotCreative>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotCreative>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAdpilotCreativeQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateAdpilotCreativeUrl = (id: string,) => {
+
+
+
+
+  return `/api/adpilot/creatives/${id}`
+}
+
+/**
+ * @summary Edit a ready creative's copy
+ */
+export const updateAdpilotCreative = async (id: string,
+    creativeEditInput: CreativeEditInput, options?: Parameters<typeof customFetch>[1]): Promise<Creative> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<Creative>(getUpdateAdpilotCreativeUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(creativeEditInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateAdpilotCreativeMutationKey = () => ['updateAdpilotCreative'] as const;
+
+export const getUpdateAdpilotCreativeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdpilotCreative>>, TError,UpdateAdpilotCreativeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdpilotCreative>>, TError,UpdateAdpilotCreativeMutationVariables, TContext> => {
+
+const mutationKey = getUpdateAdpilotCreativeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdpilotCreative>>, UpdateAdpilotCreativeMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateAdpilotCreative(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdpilotCreativeMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdpilotCreative>>>
+    export type UpdateAdpilotCreativeMutationBody = BodyType<CreativeEditInput>
+    export type UpdateAdpilotCreativeMutationError = ErrorType<unknown>
+    export type UpdateAdpilotCreativeMutationVariables = {id: string;data: BodyType<CreativeEditInput>}
+
+    /**
+ * @summary Edit a ready creative's copy
+ */
+export const useUpdateAdpilotCreative = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdpilotCreative>>, TError,UpdateAdpilotCreativeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdpilotCreative>>,
+        TError,
+        UpdateAdpilotCreativeMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateAdpilotCreativeMutationOptions(options), queryClient);
+    }
+
+export const getDuplicateAdpilotCreativeUrl = (id: string,) => {
+
+
+
+
+  return `/api/adpilot/creatives/${id}/duplicate`
+}
+
+/**
+ * @summary Duplicate a saved creative as a new draft
+ */
+export const duplicateAdpilotCreative = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<Creative> => {
+
+  return customFetch<Creative>(getDuplicateAdpilotCreativeUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getDuplicateAdpilotCreativeMutationKey = () => ['duplicateAdpilotCreative'] as const;
+
+export const getDuplicateAdpilotCreativeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof duplicateAdpilotCreative>>, TError,DuplicateAdpilotCreativeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof duplicateAdpilotCreative>>, TError,DuplicateAdpilotCreativeMutationVariables, TContext> => {
+
+const mutationKey = getDuplicateAdpilotCreativeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof duplicateAdpilotCreative>>, DuplicateAdpilotCreativeMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  duplicateAdpilotCreative(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DuplicateAdpilotCreativeMutationResult = NonNullable<Awaited<ReturnType<typeof duplicateAdpilotCreative>>>
+
+    export type DuplicateAdpilotCreativeMutationError = ErrorType<unknown>
+    export type DuplicateAdpilotCreativeMutationVariables = {id: string}
+
+    /**
+ * @summary Duplicate a saved creative as a new draft
+ */
+export const useDuplicateAdpilotCreative = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof duplicateAdpilotCreative>>, TError,DuplicateAdpilotCreativeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof duplicateAdpilotCreative>>,
+        TError,
+        DuplicateAdpilotCreativeMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDuplicateAdpilotCreativeMutationOptions(options), queryClient);
+    }
+
+export const getArchiveAdpilotCreativeUrl = (id: string,) => {
+
+
+
+
+  return `/api/adpilot/creatives/${id}/archive`
+}
+
+/**
+ * @summary Archive a local creative
+ */
+export const archiveAdpilotCreative = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getArchiveAdpilotCreativeUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getArchiveAdpilotCreativeMutationKey = () => ['archiveAdpilotCreative'] as const;
+
+export const getArchiveAdpilotCreativeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof archiveAdpilotCreative>>, TError,ArchiveAdpilotCreativeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof archiveAdpilotCreative>>, TError,ArchiveAdpilotCreativeMutationVariables, TContext> => {
+
+const mutationKey = getArchiveAdpilotCreativeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof archiveAdpilotCreative>>, ArchiveAdpilotCreativeMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  archiveAdpilotCreative(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ArchiveAdpilotCreativeMutationResult = NonNullable<Awaited<ReturnType<typeof archiveAdpilotCreative>>>
+
+    export type ArchiveAdpilotCreativeMutationError = ErrorType<unknown>
+    export type ArchiveAdpilotCreativeMutationVariables = {id: string}
+
+    /**
+ * @summary Archive a local creative
+ */
+export const useArchiveAdpilotCreative = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof archiveAdpilotCreative>>, TError,ArchiveAdpilotCreativeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof archiveAdpilotCreative>>,
+        TError,
+        ArchiveAdpilotCreativeMutationVariables,
+        TContext
+      > => {
+      return useMutation(getArchiveAdpilotCreativeMutationOptions(options), queryClient);
+    }
+
+export const getScheduleAdpilotCreativeUrl = (id: string,) => {
+
+
+
+
+  return `/api/adpilot/creatives/${id}/schedule`
+}
+
+/**
+ * @summary Schedule a ready creative for publishing
+ */
+export const scheduleAdpilotCreative = async (id: string,
+    scheduleInput: ScheduleInput, options?: Parameters<typeof customFetch>[1]): Promise<Creative> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<Creative>(getScheduleAdpilotCreativeUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(scheduleInput)
+  }
+);}
+
+
+
+
+
+export const getScheduleAdpilotCreativeMutationKey = () => ['scheduleAdpilotCreative'] as const;
+
+export const getScheduleAdpilotCreativeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduleAdpilotCreative>>, TError,ScheduleAdpilotCreativeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof scheduleAdpilotCreative>>, TError,ScheduleAdpilotCreativeMutationVariables, TContext> => {
+
+const mutationKey = getScheduleAdpilotCreativeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scheduleAdpilotCreative>>, ScheduleAdpilotCreativeMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  scheduleAdpilotCreative(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScheduleAdpilotCreativeMutationResult = NonNullable<Awaited<ReturnType<typeof scheduleAdpilotCreative>>>
+    export type ScheduleAdpilotCreativeMutationBody = BodyType<ScheduleInput>
+    export type ScheduleAdpilotCreativeMutationError = ErrorType<unknown>
+    export type ScheduleAdpilotCreativeMutationVariables = {id: string;data: BodyType<ScheduleInput>}
+
+    /**
+ * @summary Schedule a ready creative for publishing
+ */
+export const useScheduleAdpilotCreative = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduleAdpilotCreative>>, TError,ScheduleAdpilotCreativeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof scheduleAdpilotCreative>>,
+        TError,
+        ScheduleAdpilotCreativeMutationVariables,
+        TContext
+      > => {
+      return useMutation(getScheduleAdpilotCreativeMutationOptions(options), queryClient);
+    }
+
+export const getPublishAdpilotCreativeUrl = (id: string,) => {
+
+
+
+
+  return `/api/adpilot/creatives/${id}/publish`
+}
+
+/**
+ * @summary Queue a ready creative for immediate publishing
+ */
+export const publishAdpilotCreative = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<Creative> => {
+
+  return customFetch<Creative>(getPublishAdpilotCreativeUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getPublishAdpilotCreativeMutationKey = () => ['publishAdpilotCreative'] as const;
+
+export const getPublishAdpilotCreativeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishAdpilotCreative>>, TError,PublishAdpilotCreativeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof publishAdpilotCreative>>, TError,PublishAdpilotCreativeMutationVariables, TContext> => {
+
+const mutationKey = getPublishAdpilotCreativeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publishAdpilotCreative>>, PublishAdpilotCreativeMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  publishAdpilotCreative(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PublishAdpilotCreativeMutationResult = NonNullable<Awaited<ReturnType<typeof publishAdpilotCreative>>>
+
+    export type PublishAdpilotCreativeMutationError = ErrorType<unknown>
+    export type PublishAdpilotCreativeMutationVariables = {id: string}
+
+    /**
+ * @summary Queue a ready creative for immediate publishing
+ */
+export const usePublishAdpilotCreative = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishAdpilotCreative>>, TError,PublishAdpilotCreativeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof publishAdpilotCreative>>,
+        TError,
+        PublishAdpilotCreativeMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPublishAdpilotCreativeMutationOptions(options), queryClient);
+    }
+
+export const getVerifyAdpilotConnectionsUrl = () => {
+
+
+
+
+  return `/api/adpilot/connections/verify`
+}
+
+/**
+ * @summary Check configured social account identities
+ */
+export const verifyAdpilotConnections = async ( options?: Parameters<typeof customFetch>[1]): Promise<ConnectionVerification> => {
+
+  return customFetch<ConnectionVerification>(getVerifyAdpilotConnectionsUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getVerifyAdpilotConnectionsMutationKey = () => ['verifyAdpilotConnections'] as const;
+
+export const getVerifyAdpilotConnectionsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyAdpilotConnections>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof verifyAdpilotConnections>>, TError,void, TContext> => {
+
+const mutationKey = getVerifyAdpilotConnectionsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifyAdpilotConnections>>, void> = () => {
+
+
+          return  verifyAdpilotConnections(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerifyAdpilotConnectionsMutationResult = NonNullable<Awaited<ReturnType<typeof verifyAdpilotConnections>>>
+
+    export type VerifyAdpilotConnectionsMutationError = ErrorType<unknown>
+
+
+    /**
+ * @summary Check configured social account identities
+ */
+export const useVerifyAdpilotConnections = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyAdpilotConnections>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof verifyAdpilotConnections>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getVerifyAdpilotConnectionsMutationOptions(options), queryClient);
+    }
+
+export const getStartAdpilotOAuthUrl = (provider: 'meta' | 'linkedin',) => {
+
+
+
+
+  return `/api/adpilot/oauth/${provider}/start`
+}
+
+/**
+ * @summary Begin a provider account authorization
+ */
+export const startAdpilotOAuth = async (provider: 'meta' | 'linkedin', options?: Parameters<typeof customFetch>[1]): Promise<OAuthStartResponse> => {
+
+  return customFetch<OAuthStartResponse>(getStartAdpilotOAuthUrl(provider),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getStartAdpilotOAuthMutationKey = () => ['startAdpilotOAuth'] as const;
+
+export const getStartAdpilotOAuthMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startAdpilotOAuth>>, TError,StartAdpilotOAuthMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof startAdpilotOAuth>>, TError,StartAdpilotOAuthMutationVariables, TContext> => {
+
+const mutationKey = getStartAdpilotOAuthMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startAdpilotOAuth>>, StartAdpilotOAuthMutationVariables> = (props) => {
+          const {provider} = props ?? {};
+
+          return  startAdpilotOAuth(provider,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StartAdpilotOAuthMutationResult = NonNullable<Awaited<ReturnType<typeof startAdpilotOAuth>>>
+
+    export type StartAdpilotOAuthMutationError = ErrorType<unknown>
+    export type StartAdpilotOAuthMutationVariables = {provider: 'meta' | 'linkedin'}
+
+    /**
+ * @summary Begin a provider account authorization
+ */
+export const useStartAdpilotOAuth = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startAdpilotOAuth>>, TError,StartAdpilotOAuthMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof startAdpilotOAuth>>,
+        TError,
+        StartAdpilotOAuthMutationVariables,
+        TContext
+      > => {
+      return useMutation(getStartAdpilotOAuthMutationOptions(options), queryClient);
+    }
+
+export const getListAdpilotAdminAccountsUrl = () => {
+
+
+
+
+  return `/api/adpilot/admin/accounts`
+}
+
+/**
+ * @summary List accounts for the configured service owner
+ */
+export const listAdpilotAdminAccounts = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdminAccountList> => {
+
+  return customFetch<AdminAccountList>(getListAdpilotAdminAccountsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdpilotAdminAccountsQueryKey = () => {
+    return [
+    `/api/adpilot/admin/accounts`
+    ] as const;
+    }
+
+
+export const getListAdpilotAdminAccountsQueryOptions = <TData = Awaited<ReturnType<typeof listAdpilotAdminAccounts>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotAdminAccounts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdpilotAdminAccountsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdpilotAdminAccounts>>> = ({ signal }) => listAdpilotAdminAccounts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdpilotAdminAccounts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAdpilotAdminAccountsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdpilotAdminAccounts>>>
+export type ListAdpilotAdminAccountsQueryError = ErrorType<void>
+
+
+export function useListAdpilotAdminAccounts<TData = Awaited<ReturnType<typeof listAdpilotAdminAccounts>>, TError = ErrorType<void>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotAdminAccounts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdpilotAdminAccounts>>,
+          TError,
+          Awaited<ReturnType<typeof listAdpilotAdminAccounts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdpilotAdminAccounts<TData = Awaited<ReturnType<typeof listAdpilotAdminAccounts>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotAdminAccounts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdpilotAdminAccounts>>,
+          TError,
+          Awaited<ReturnType<typeof listAdpilotAdminAccounts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdpilotAdminAccounts<TData = Awaited<ReturnType<typeof listAdpilotAdminAccounts>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotAdminAccounts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List accounts for the configured service owner
+ */
+
+export function useListAdpilotAdminAccounts<TData = Awaited<ReturnType<typeof listAdpilotAdminAccounts>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotAdminAccounts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAdpilotAdminAccountsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateAdpilotAdminAccountUrl = (businessId: number,) => {
+
+
+
+
+  return `/api/adpilot/admin/accounts/${businessId}`
+}
+
+/**
+ * @summary Activate, suspend, or update an account allowance
+ */
+export const updateAdpilotAdminAccount = async (businessId: number,
+    adminAccountUpdate: AdminAccountUpdate, options?: Parameters<typeof customFetch>[1]): Promise<OkResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<OkResponse>(getUpdateAdpilotAdminAccountUrl(businessId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adminAccountUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateAdpilotAdminAccountMutationKey = () => ['updateAdpilotAdminAccount'] as const;
+
+export const getUpdateAdpilotAdminAccountMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdpilotAdminAccount>>, TError,UpdateAdpilotAdminAccountMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdpilotAdminAccount>>, TError,UpdateAdpilotAdminAccountMutationVariables, TContext> => {
+
+const mutationKey = getUpdateAdpilotAdminAccountMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdpilotAdminAccount>>, UpdateAdpilotAdminAccountMutationVariables> = (props) => {
+          const {businessId,data} = props ?? {};
+
+          return  updateAdpilotAdminAccount(businessId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdpilotAdminAccountMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdpilotAdminAccount>>>
+    export type UpdateAdpilotAdminAccountMutationBody = BodyType<AdminAccountUpdate>
+    export type UpdateAdpilotAdminAccountMutationError = ErrorType<void>
+    export type UpdateAdpilotAdminAccountMutationVariables = {businessId: number;data: BodyType<AdminAccountUpdate>}
+
+    /**
+ * @summary Activate, suspend, or update an account allowance
+ */
+export const useUpdateAdpilotAdminAccount = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdpilotAdminAccount>>, TError,UpdateAdpilotAdminAccountMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdpilotAdminAccount>>,
+        TError,
+        UpdateAdpilotAdminAccountMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateAdpilotAdminAccountMutationOptions(options), queryClient);
+    }
+
+export const getCreateAdpilotPasswordResetUrl = (businessId: number,) => {
+
+
+
+
+  return `/api/adpilot/admin/accounts/${businessId}/reset-link`
+}
+
+/**
+ * @summary Create a one-use password reset link
+ */
+export const createAdpilotPasswordReset = async (businessId: number, options?: Parameters<typeof customFetch>[1]): Promise<PasswordResetLink> => {
+
+  return customFetch<PasswordResetLink>(getCreateAdpilotPasswordResetUrl(businessId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getCreateAdpilotPasswordResetMutationKey = () => ['createAdpilotPasswordReset'] as const;
+
+export const getCreateAdpilotPasswordResetMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdpilotPasswordReset>>, TError,CreateAdpilotPasswordResetMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdpilotPasswordReset>>, TError,CreateAdpilotPasswordResetMutationVariables, TContext> => {
+
+const mutationKey = getCreateAdpilotPasswordResetMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdpilotPasswordReset>>, CreateAdpilotPasswordResetMutationVariables> = (props) => {
+          const {businessId} = props ?? {};
+
+          return  createAdpilotPasswordReset(businessId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdpilotPasswordResetMutationResult = NonNullable<Awaited<ReturnType<typeof createAdpilotPasswordReset>>>
+
+    export type CreateAdpilotPasswordResetMutationError = ErrorType<void>
+    export type CreateAdpilotPasswordResetMutationVariables = {businessId: number}
+
+    /**
+ * @summary Create a one-use password reset link
+ */
+export const useCreateAdpilotPasswordReset = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdpilotPasswordReset>>, TError,CreateAdpilotPasswordResetMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAdpilotPasswordReset>>,
+        TError,
+        CreateAdpilotPasswordResetMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateAdpilotPasswordResetMutationOptions(options), queryClient);
+    }
+
+export const getGetAdpilotDashboardUrl = () => {
+
+
+
+
+  return `/api/adpilot/dashboard`
+}
+
+/**
+ * @summary Get overview, job, and publishing activity
+ */
+export const getAdpilotDashboard = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdpilotDashboard> => {
+
+  return customFetch<AdpilotDashboard>(getGetAdpilotDashboardUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdpilotDashboardQueryKey = () => {
+    return [
+    `/api/adpilot/dashboard`
+    ] as const;
+    }
+
+
+export const getGetAdpilotDashboardQueryOptions = <TData = Awaited<ReturnType<typeof getAdpilotDashboard>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotDashboard>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdpilotDashboardQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdpilotDashboard>>> = ({ signal }) => getAdpilotDashboard({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdpilotDashboard>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAdpilotDashboardQueryResult = NonNullable<Awaited<ReturnType<typeof getAdpilotDashboard>>>
+export type GetAdpilotDashboardQueryError = ErrorType<unknown>
+
+
+export function useGetAdpilotDashboard<TData = Awaited<ReturnType<typeof getAdpilotDashboard>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotDashboard>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdpilotDashboard>>,
+          TError,
+          Awaited<ReturnType<typeof getAdpilotDashboard>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdpilotDashboard<TData = Awaited<ReturnType<typeof getAdpilotDashboard>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotDashboard>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdpilotDashboard>>,
+          TError,
+          Awaited<ReturnType<typeof getAdpilotDashboard>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdpilotDashboard<TData = Awaited<ReturnType<typeof getAdpilotDashboard>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotDashboard>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get overview, job, and publishing activity
+ */
+
+export function useGetAdpilotDashboard<TData = Awaited<ReturnType<typeof getAdpilotDashboard>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdpilotDashboard>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAdpilotDashboardQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListAdpilotPaidCampaignsUrl = () => {
+
+
+
+
+  return `/api/adpilot/paid`
+}
+
+/**
+ * @summary List paid Facebook campaign plans
+ */
+export const listAdpilotPaidCampaigns = async ( options?: Parameters<typeof customFetch>[1]): Promise<PaidCampaignList> => {
+
+  return customFetch<PaidCampaignList>(getListAdpilotPaidCampaignsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdpilotPaidCampaignsQueryKey = () => {
+    return [
+    `/api/adpilot/paid`
+    ] as const;
+    }
+
+
+export const getListAdpilotPaidCampaignsQueryOptions = <TData = Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdpilotPaidCampaignsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>> = ({ signal }) => listAdpilotPaidCampaigns({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAdpilotPaidCampaignsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>>
+export type ListAdpilotPaidCampaignsQueryError = ErrorType<unknown>
+
+
+export function useListAdpilotPaidCampaigns<TData = Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>,
+          TError,
+          Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdpilotPaidCampaigns<TData = Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>,
+          TError,
+          Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdpilotPaidCampaigns<TData = Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List paid Facebook campaign plans
+ */
+
+export function useListAdpilotPaidCampaigns<TData = Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdpilotPaidCampaigns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAdpilotPaidCampaignsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateAdpilotPaidCampaignUrl = () => {
+
+
+
+
+  return `/api/adpilot/paid`
+}
+
+/**
+ * @summary Save a validated ZAR Facebook traffic plan
+ */
+export const createAdpilotPaidCampaign = async (paidCampaignInput: PaidCampaignInput, options?: Parameters<typeof customFetch>[1]): Promise<PaidCampaign> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PaidCampaign>(getCreateAdpilotPaidCampaignUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(paidCampaignInput)
+  }
+);}
+
+
+
+
+
+export const getCreateAdpilotPaidCampaignMutationKey = () => ['createAdpilotPaidCampaign'] as const;
+
+export const getCreateAdpilotPaidCampaignMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdpilotPaidCampaign>>, TError,CreateAdpilotPaidCampaignMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdpilotPaidCampaign>>, TError,CreateAdpilotPaidCampaignMutationVariables, TContext> => {
+
+const mutationKey = getCreateAdpilotPaidCampaignMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdpilotPaidCampaign>>, CreateAdpilotPaidCampaignMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAdpilotPaidCampaign(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdpilotPaidCampaignMutationResult = NonNullable<Awaited<ReturnType<typeof createAdpilotPaidCampaign>>>
+    export type CreateAdpilotPaidCampaignMutationBody = BodyType<PaidCampaignInput>
+    export type CreateAdpilotPaidCampaignMutationError = ErrorType<unknown>
+    export type CreateAdpilotPaidCampaignMutationVariables = {data: BodyType<PaidCampaignInput>}
+
+    /**
+ * @summary Save a validated ZAR Facebook traffic plan
+ */
+export const useCreateAdpilotPaidCampaign = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdpilotPaidCampaign>>, TError,CreateAdpilotPaidCampaignMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAdpilotPaidCampaign>>,
+        TError,
+        CreateAdpilotPaidCampaignMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateAdpilotPaidCampaignMutationOptions(options), queryClient);
+    }
+
+export const getActOnAdpilotPaidCampaignUrl = (id: string,
+    action: 'submit' | 'launch' | 'pause' | 'refresh',) => {
+
+
+
+
+  return `/api/adpilot/paid/${id}/${action}`
+}
+
+/**
+ * @summary Submit, launch, pause, or refresh a Meta campaign
+ */
+export const actOnAdpilotPaidCampaign = async (id: string,
+    action: 'submit' | 'launch' | 'pause' | 'refresh',
+    paidCampaignAction?: PaidCampaignAction, options?: Parameters<typeof customFetch>[1]): Promise<PaidCampaign> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PaidCampaign>(getActOnAdpilotPaidCampaignUrl(id,action),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(paidCampaignAction)
+  }
+);}
+
+
+
+
+
+export const getActOnAdpilotPaidCampaignMutationKey = () => ['actOnAdpilotPaidCampaign'] as const;
+
+export const getActOnAdpilotPaidCampaignMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof actOnAdpilotPaidCampaign>>, TError,ActOnAdpilotPaidCampaignMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof actOnAdpilotPaidCampaign>>, TError,ActOnAdpilotPaidCampaignMutationVariables, TContext> => {
+
+const mutationKey = getActOnAdpilotPaidCampaignMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof actOnAdpilotPaidCampaign>>, ActOnAdpilotPaidCampaignMutationVariables> = (props) => {
+          const {id,action,data} = props ?? {};
+
+          return  actOnAdpilotPaidCampaign(id,action,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ActOnAdpilotPaidCampaignMutationResult = NonNullable<Awaited<ReturnType<typeof actOnAdpilotPaidCampaign>>>
+    export type ActOnAdpilotPaidCampaignMutationBody = BodyType<PaidCampaignAction> | undefined
+    export type ActOnAdpilotPaidCampaignMutationError = ErrorType<unknown>
+    export type ActOnAdpilotPaidCampaignMutationVariables = {id: string;action: 'submit' | 'launch' | 'pause' | 'refresh';data?: BodyType<PaidCampaignAction>}
+
+    /**
+ * @summary Submit, launch, pause, or refresh a Meta campaign
+ */
+export const useActOnAdpilotPaidCampaign = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof actOnAdpilotPaidCampaign>>, TError,ActOnAdpilotPaidCampaignMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof actOnAdpilotPaidCampaign>>,
+        TError,
+        ActOnAdpilotPaidCampaignMutationVariables,
+        TContext
+      > => {
+      return useMutation(getActOnAdpilotPaidCampaignMutationOptions(options), queryClient);
     }
 

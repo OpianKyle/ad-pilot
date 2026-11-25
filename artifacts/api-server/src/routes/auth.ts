@@ -20,6 +20,8 @@ import {
   rotateSession,
   verifyCsrf,
 } from "../lib/mysql";
+import { ensureAdpilotSchema } from "../lib/adpilot-schema";
+import { isPlatformOwnerEmail } from "../lib/adpilot-auth";
 
 const router: IRouter = Router();
 
@@ -35,6 +37,19 @@ router.use("/auth", authLimiter);
 
 function databaseUnavailable(res: Response): void {
   res.status(503).json({ error: "The MySQL database is not configured or is unavailable." });
+}
+
+async function businessStatus(
+  businessId: number,
+): Promise<"pending" | "active" | "suspended"> {
+  await ensureAdpilotSchema();
+  const [rows] = await getMysqlPool().execute<
+    (RowDataPacket & { status: "pending" | "active" | "suspended" })[]
+  >(
+    "SELECT status FROM adpilot_business_access WHERE business_id = ? LIMIT 1",
+    [businessId],
+  );
+  return rows[0]?.status ?? "active";
 }
 
 function logFailure(req: Request, error: unknown, action: string): void {
@@ -87,7 +102,8 @@ router.get("/auth/me", async (req, res): Promise<void> => {
       res.status(401).json({ error: "Authentication required" });
       return;
     }
-    res.json(GetCurrentUserResponse.parse({ user }));
+    const workspaceStatus = await businessStatus(user.businessId);
+    res.json(GetCurrentUserResponse.parse({ user: { ...user, workspaceStatus } }));
   } catch (error) {
     logFailure(req, error, "current-user request");
     databaseUnavailable(res);
@@ -100,6 +116,7 @@ router.post("/auth/register", async (req, res): Promise<void> => {
     return;
   }
   try {
+    await ensureAdpilotSchema();
     const session = await verifyCsrf(req);
     if (!session) {
       res.status(403).json({ error: "Refresh the page and try again." });
@@ -136,6 +153,12 @@ router.post("/auth/register", async (req, res): Promise<void> => {
         [businessId, input.name, input.email, passwordHash],
       );
       userId = Number(userResult.insertId);
+      await connection.execute(
+        `INSERT INTO adpilot_business_access
+          (business_id, status, plan, monthly_generation_limit)
+         VALUES (?, 'pending', 'Pilot', 30)`,
+        [businessId],
+      );
       await connection.commit();
     } catch (error) {
       await connection.rollback();
@@ -156,6 +179,7 @@ router.post("/auth/register", async (req, res): Promise<void> => {
           name: input.name,
           email: input.email,
           role: "owner",
+          workspaceStatus: "pending",
         },
       }),
     );
@@ -206,12 +230,22 @@ router.post("/auth/login", async (req, res): Promise<void> => {
       res.status(401).json({ error: "Invalid email or password." });
       return;
     }
+    const workspaceStatus = await businessStatus(Number(row.businessId));
+    if (workspaceStatus !== "active" && !isPlatformOwnerEmail(row.email)) {
+      res.status(403).json({
+        error: workspaceStatus === "pending"
+          ? "Your workspace is waiting for owner activation."
+          : "This workspace is suspended. Contact the service owner.",
+      });
+      return;
+    }
     const user = {
       id: Number(row.id),
       businessId: Number(row.businessId),
       name: row.name,
       email: row.email,
       role: row.role,
+      workspaceStatus,
     };
     await rotateSession(res, session, user.id);
     res.json(LoginAccountResponse.parse({ user }));

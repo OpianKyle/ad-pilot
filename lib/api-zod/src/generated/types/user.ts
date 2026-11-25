@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { UserRole } from './userRole';
+import type { UserWorkspaceStatus } from './userWorkspaceStatus';
 
 export interface User {
   id: number;
@@ -13,4 +14,5 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  workspaceStatus: UserWorkspaceStatus;
 }

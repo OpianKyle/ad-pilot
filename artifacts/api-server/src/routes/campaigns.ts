@@ -7,12 +7,11 @@ import {
   ListCampaignsResponse,
 } from "@workspace/api-zod";
 import {
-  currentUserForSession,
   getMysqlPool,
-  getRequestSession,
   isMysqlConfigured,
   verifyCsrf,
 } from "../lib/mysql";
+import { getAdpilotContext } from "../lib/adpilot-auth";
 
 const router: IRouter = Router();
 
@@ -34,17 +33,8 @@ function logFailure(req: Request, error: unknown, action: string): void {
 }
 
 async function getBusinessId(req: Request, res: Response): Promise<number | null> {
-  const session = await getRequestSession(req);
-  if (!session) {
-    res.status(401).json({ error: "Authentication required" });
-    return null;
-  }
-  const user = await currentUserForSession(session);
-  if (!user) {
-    res.status(401).json({ error: "Authentication required" });
-    return null;
-  }
-  return user.businessId;
+  const context = await getAdpilotContext(req, res);
+  return context?.user.businessId ?? null;
 }
 
 function toCampaign(row: CampaignRow) {
