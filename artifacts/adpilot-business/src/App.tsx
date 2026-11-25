@@ -16,6 +16,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import PreviewWorkspace from '@/pages/preview-workspace';
+import { workspaceSections } from '@/lib/workspace-sections';
 import {
   ArrowDownRight,
   ArrowRight,
@@ -32,7 +33,6 @@ import {
   Radio,
   Search,
   Send,
-  Sparkles,
   X,
 } from 'lucide-react';
 import { Link, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
@@ -89,7 +89,12 @@ function AppFrame() {
   const mysqlSetupNeeded =
     httpStatus(current.error) === 503 || httpStatus(csrf.error) === 503;
   const isAuthRoute = location === '/login' || location === '/register';
-  const isWorkspaceSectionsRoute = location === '/workspace-sections';
+  const activeWorkspaceSection = workspaceSections.find((section) => section.path === location);
+  const embeddedSection =
+    activeWorkspaceSection && activeWorkspaceSection.id !== 'overview'
+      ? activeWorkspaceSection
+      : undefined;
+  const selectedNavPath = location === '/campaigns' ? '/planner' : location;
 
   useEffect(() => {
     setMobileNav(false);
@@ -105,22 +110,6 @@ function AppFrame() {
       },
     });
   };
-
-  if (isWorkspaceSectionsRoute) {
-    if (current.isLoading) return <WorkspaceLoading />;
-    if (!user) {
-      return (
-        <Unauthenticated
-          currentError={
-            current.isError && httpStatus(current.error) !== 401
-              ? messageFrom(current.error, 'We couldn’t check your session. Please sign in to continue.')
-              : null
-          }
-        />
-      );
-    }
-    return <PreviewWorkspace accountName={user.name} />;
-  }
 
   return (
     <div className="min-h-[100dvh] bg-[#f5f3ec] text-[#28323a]">
@@ -140,19 +129,39 @@ function AppFrame() {
               </Link>
               <button onClick={() => setMobileNav(false)} className="apw-mobile-close" aria-label="Close navigation" data-testid="button-close-navigation"><X size={18} /></button>
             </div>
-            <nav className="apw-nav apw-auth-nav">
-              <div className="apw-nav-group">
-                <div className="apw-nav-heading">Workspace</div>
-                <Link href="/" className={`apw-nav-item ${location === '/' ? 'apw-nav-selected' : ''}`} aria-current={location === '/' ? 'page' : undefined} data-testid="link-dashboard"><LayoutDashboard size={17} strokeWidth={1.8} /><span>Overview</span></Link>
-                <Link href="/campaigns" className={`apw-nav-item ${location === '/campaigns' ? 'apw-nav-selected' : ''}`} aria-current={location === '/campaigns' ? 'page' : undefined} data-testid="link-campaigns"><FileText size={17} strokeWidth={1.8} /><span>Campaigns</span></Link>
-                {user && <Link href="/workspace-sections" className={`apw-nav-item ${isWorkspaceSectionsRoute ? 'apw-nav-selected' : ''}`} aria-current={isWorkspaceSectionsRoute ? 'page' : undefined} data-testid="link-workspace-sections"><Sparkles size={17} strokeWidth={1.8} /><span>Workspace sections</span></Link>}
-              </div>
+            {user && <div className="apw-demo-pill"><span />SECTION PREVIEW</div>}
+            <nav className={`apw-nav ${user ? '' : 'apw-auth-nav'}`}>
+              {user ? (
+                (['Workspace', 'Campaigns', 'Business'] as const).map((group) => (
+                  <div className="apw-nav-group" key={group}>
+                    <div className="apw-nav-heading">{group}</div>
+                    {workspaceSections.filter((section) => section.group === group).map(({ id, label, icon: Icon, path }) => (
+                      <Link
+                        key={id}
+                        href={path}
+                        className={`apw-nav-item ${selectedNavPath === path ? 'apw-nav-selected' : ''}`}
+                        aria-current={selectedNavPath === path ? 'page' : undefined}
+                        data-testid={id === 'overview' ? 'link-dashboard' : `link-workspace-${id}`}
+                      >
+                        <Icon size={17} strokeWidth={1.8} />
+                        <span>{label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                ))
+              ) : (
+                <div className="apw-nav-group">
+                  <div className="apw-nav-heading">Workspace</div>
+                  <Link href="/" className={`apw-nav-item ${location === '/' ? 'apw-nav-selected' : ''}`} aria-current={location === '/' ? 'page' : undefined} data-testid="link-dashboard"><LayoutDashboard size={17} strokeWidth={1.8} /><span>Overview</span></Link>
+                  <Link href="/campaigns" className={`apw-nav-item ${location === '/campaigns' ? 'apw-nav-selected' : ''}`} aria-current={location === '/campaigns' ? 'page' : undefined} data-testid="link-campaigns"><FileText size={17} strokeWidth={1.8} /><span>Campaigns</span></Link>
+                </div>
+              )}
             </nav>
             <div className="apw-sidebar-bottom">
               <div className="apw-sidebar-note">
                 <div className="apw-note-icon"><CircleHelp size={15} /></div>
-                <p>Your campaigns stay here while you shape the next step.</p>
-                <span>CHANNELS NOT CONNECTED</span>
+                <p>{user ? 'Your work stays here until you decide what to do next.' : 'Your campaigns stay here while you shape the next step.'}</p>
+                <span>{user ? 'NO CONNECTIONS · NO PUBLISHING' : 'CHANNELS NOT CONNECTED'}</span>
               </div>
               {user ? (
                 <div className="apw-user-chip">
@@ -172,7 +181,7 @@ function AppFrame() {
           <main className="apw-main">
             <header className="apw-topbar">
               <button className="apw-menu-toggle" aria-label="Open navigation" onClick={() => setMobileNav(true)} data-testid="button-open-navigation"><Menu size={19} /></button>
-              <div className="apw-breadcrumb"><span>ADPILOT</span><ChevronRight size={13} /><strong>{location === '/campaigns' ? 'Campaigns' : 'Overview'}</strong></div>
+              <div className="apw-breadcrumb"><span>ADPILOT</span><ChevronRight size={13} /><strong>{location === '/campaigns' ? 'Campaigns' : activeWorkspaceSection?.label ?? 'Overview'}</strong></div>
               <div className="apw-topbar-right">
                 {user && <span className="apw-working-as">Working as <strong>{user.name.split(' ')[0]}</strong></span>}
                 <span className={`apw-channel-state ${mysqlSetupNeeded ? 'apw-channel-setup' : ''}`}><span />{mysqlSetupNeeded ? 'Workspace setup needed' : 'Channels not connected'}</span>
@@ -188,7 +197,24 @@ function AppFrame() {
                 <Route path="/campaigns">
                   {current.isLoading ? <WorkspaceLoading /> : user ? <CampaignsPage /> : <Unauthenticated currentError={current.isError && httpStatus(current.error) !== 401 ? messageFrom(current.error, 'We couldn’t check your session. Please sign in to continue.') : null} />}
                 </Route>
-                <Route component={NotFound} />
+                <Route>
+                  {current.isLoading ? (
+                    <WorkspaceLoading />
+                  ) : user && embeddedSection ? (
+                    <PreviewWorkspace
+                      embedded
+                      initialSection={embeddedSection.id}
+                      onSectionChange={(next) => {
+                        const destination = workspaceSections.find((section) => section.id === next)?.path;
+                        setLocation(destination ?? '/');
+                      }}
+                    />
+                  ) : user ? (
+                    <NotFound />
+                  ) : (
+                    <Unauthenticated currentError={current.isError && httpStatus(current.error) !== 401 ? messageFrom(current.error, 'We couldn’t check your session. Please sign in to continue.') : null} />
+                  )}
+                </Route>
               </Switch>
             </RoutedErrorBoundary>
             </div>

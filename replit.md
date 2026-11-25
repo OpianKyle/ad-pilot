@@ -45,7 +45,7 @@ AdPilot Business is a web workspace for business owners to create and organize s
 
 ## User preferences
 
-_No project-specific preferences recorded._
+- The signed-in workspace must use the same grouped sidebar and section links as `/preview`; keep sections in the main workspace instead of adding a separate sections page.
 
 ## Gotchas
 

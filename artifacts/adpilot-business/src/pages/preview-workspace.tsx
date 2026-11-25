@@ -14,10 +14,8 @@ import {
   Clock3,
   Copy,
   CreditCard,
-  FileImage,
   FileText,
   ImagePlus,
-  LayoutDashboard,
   Menu,
   MessageSquareText,
   MoreHorizontal,
@@ -25,27 +23,15 @@ import {
   Plus,
   Radio,
   Save,
-  Settings2,
   ShieldCheck,
   Sparkles,
   Upload,
   Users,
   X,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { Link } from 'wouter';
-
-type Section =
-  | 'overview'
-  | 'studio'
-  | 'photos'
-  | 'planner'
-  | 'briefs'
-  | 'paid'
-  | 'connections'
-  | 'brand'
-  | 'activity'
-  | 'owner';
+import { workspaceSections, type PreviewSection } from '@/lib/workspace-sections';
+type Section = PreviewSection;
 
 type DraftStatus = 'draft' | 'scheduled' | 'archived';
 type Draft = {
@@ -120,18 +106,7 @@ const directions = [
   'Business owner at work',
   'Life milestone',
 ];
-const sections: { id: Section; label: string; icon: LucideIcon; group: string }[] = [
-  { id: 'overview', label: 'Overview', icon: LayoutDashboard, group: 'Workspace' },
-  { id: 'studio', label: 'Creative studio', icon: Sparkles, group: 'Workspace' },
-  { id: 'photos', label: 'Brand photographs', icon: FileImage, group: 'Workspace' },
-  { id: 'planner', label: 'Publishing planner', icon: CalendarDays, group: 'Workspace' },
-  { id: 'briefs', label: 'Campaign briefs', icon: FileText, group: 'Campaigns' },
-  { id: 'paid', label: 'Paid campaign plan', icon: BarChart3, group: 'Campaigns' },
-  { id: 'connections', label: 'Channels', icon: Radio, group: 'Business' },
-  { id: 'brand', label: 'Brand & defaults', icon: Settings2, group: 'Business' },
-  { id: 'activity', label: 'Activity history', icon: Activity, group: 'Business' },
-  { id: 'owner', label: 'Owner preview', icon: Users, group: 'Business' },
-];
+const sections = workspaceSections;
 
 function localDateTime(daysFromToday: number, hour = 9) {
   const date = new Date();
@@ -350,8 +325,16 @@ function LocalOnlyNote({ children = 'Local demo only · nothing is sent to a pla
   return <div className="apw-local-note"><ShieldCheck size={14} /><span>{children}</span></div>;
 }
 
-export default function PreviewWorkspace({ accountName }: { accountName?: string } = {}) {
-  const [section, setSection] = useState<Section>('overview');
+export default function PreviewWorkspace({
+  embedded = false,
+  initialSection = 'overview',
+  onSectionChange,
+}: {
+  embedded?: boolean;
+  initialSection?: PreviewSection;
+  onSectionChange?: (section: PreviewSection) => void;
+} = {}) {
+  const [section, setSection] = useState<Section>(initialSection);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [drafts, setDrafts] = useState<Draft[]>(() => readLocal('drafts', starterDrafts));
   const [briefs, setBriefs] = useState<Brief[]>(() => readLocal('briefs', starterBriefs));
@@ -404,6 +387,7 @@ export default function PreviewWorkspace({ accountName }: { accountName?: string
   useEffect(() => storeLocal('activity', activity.slice(0, 40)), [activity]);
   useEffect(() => storeLocal('settings', settings), [settings]);
   useEffect(() => storeLocal('paid-plan', paidPlan), [paidPlan]);
+  useEffect(() => setSection(initialSection), [initialSection]);
   useEffect(() => {
     if (!toast) return;
     const timer = window.setTimeout(() => setToast(''), 3200);
@@ -449,6 +433,7 @@ export default function PreviewWorkspace({ accountName }: { accountName?: string
   function navigate(next: Section) {
     setSection(next);
     setMobileMenuOpen(false);
+    onSectionChange?.(next);
   }
   function createDraft(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -598,66 +583,64 @@ export default function PreviewWorkspace({ accountName }: { accountName?: string
     : section === 'planner'
       ? <AppButton kind="outline" testId="button-planner-create" onClick={() => navigate('studio')}><Plus size={15} /> Add a draft</AppButton>
       : undefined;
-  const sidebarName = accountName ?? settings.adviser;
-  const sidebarInitials = accountName
-    ? accountName.trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase() ?? '').join('')
-    : 'ME';
-
   return (
-    <div className="apw-root" style={{ '--apw-brand': settings.brandColor } as CSSProperties}>
+    <div className={`apw-root ${embedded ? 'apw-root-embedded' : ''}`} style={{ '--apw-brand': settings.brandColor } as CSSProperties}>
       <style>{styles}</style>
-      <aside className={`apw-sidebar ${mobileMenuOpen ? 'apw-sidebar-open' : ''}`} aria-label="Workspace navigation">
-        <div className="apw-brand-lockup">
-          <span className="apw-brand-mark"><Radio size={18} strokeWidth={2.2} /></span>
-          <span className="apw-wordmark">adpilot<span>.</span></span>
-          <button className="apw-mobile-close" onClick={() => setMobileMenuOpen(false)} aria-label="Close navigation" data-testid="button-close-workspace-navigation"><X size={18} /></button>
-        </div>
-        <div className="apw-demo-pill"><span />{accountName ? 'SECTION PREVIEW' : 'LOCAL DEMO'}</div>
-        <nav className="apw-nav">
-          {(['Workspace', 'Campaigns', 'Business'] as const).map((group) => (
-            <div className="apw-nav-group" key={group}>
-              <div className="apw-nav-heading">{group}</div>
-              {sections.filter((item) => item.group === group).map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  onClick={() => navigate(id)}
-                  className={`apw-nav-item ${section === id ? 'apw-nav-selected' : ''}`}
-                  aria-current={section === id ? 'page' : undefined}
-                  data-testid={`nav-${id}`}
-                >
-                  <Icon size={17} strokeWidth={1.8} /><span>{label}</span>
-                  {id === 'planner' && scheduledCount > 0 && <span className="apw-nav-count">{scheduledCount}</span>}
-                </button>
-              ))}
+      {embedded && <style>{`.apw-root-embedded{display:block;min-height:0;background:transparent;overflow:visible}.apw-root-embedded .apw-main{margin-left:0}.apw-root-embedded .apw-content{width:100%;min-height:0;margin:0;padding:0}`}</style>}
+      {!embedded && (
+        <aside className={`apw-sidebar ${mobileMenuOpen ? 'apw-sidebar-open' : ''}`} aria-label="Workspace navigation">
+          <div className="apw-brand-lockup">
+            <span className="apw-brand-mark"><Radio size={18} strokeWidth={2.2} /></span>
+            <span className="apw-wordmark">adpilot<span>.</span></span>
+            <button className="apw-mobile-close" onClick={() => setMobileMenuOpen(false)} aria-label="Close navigation" data-testid="button-close-workspace-navigation"><X size={18} /></button>
+          </div>
+          <div className="apw-demo-pill"><span />LOCAL DEMO</div>
+          <nav className="apw-nav">
+            {(['Workspace', 'Campaigns', 'Business'] as const).map((group) => (
+              <div className="apw-nav-group" key={group}>
+                <div className="apw-nav-heading">{group}</div>
+                {sections.filter((item) => item.group === group).map(({ id, label, icon: Icon }) => (
+                  <button
+                    key={id}
+                    onClick={() => navigate(id)}
+                    className={`apw-nav-item ${section === id ? 'apw-nav-selected' : ''}`}
+                    aria-current={section === id ? 'page' : undefined}
+                    data-testid={`nav-${id}`}
+                  >
+                    <Icon size={17} strokeWidth={1.8} /><span>{label}</span>
+                    {id === 'planner' && scheduledCount > 0 && <span className="apw-nav-count">{scheduledCount}</span>}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </nav>
+          <div className="apw-sidebar-bottom">
+            <div className="apw-sidebar-note">
+              <div className="apw-note-icon"><CircleHelp size={15} /></div>
+              <p>Your work stays here until you decide what to do next.</p>
+              <span>NO CONNECTIONS · NO PUBLISHING</span>
             </div>
-          ))}
-        </nav>
-        <div className="apw-sidebar-bottom">
-          <div className="apw-sidebar-note">
-            <div className="apw-note-icon"><CircleHelp size={15} /></div>
-            <p>Your work stays here until you decide what to do next.</p>
-            <span>NO CONNECTIONS · NO PUBLISHING</span>
+            <Link href="/" className="nav-item" data-testid="link-exit-preview"><ArrowDownRight size={16} /><span>Return to the sign-in page</span></Link>
+            <div className="apw-user-chip">
+              <div className="apw-avatar">ME</div>
+              <div><strong>{settings.adviser}</strong><span>Workspace owner · preview</span></div>
+              <MoreHorizontal size={17} aria-hidden="true" />
+            </div>
           </div>
-          <Link href="/" className="nav-item" data-testid="link-exit-preview"><ArrowDownRight size={16} /><span>{accountName ? 'Return to overview' : 'Return to the sign-in page'}</span></Link>
-          <div className="apw-user-chip">
-            <div className="apw-avatar">{sidebarInitials}</div>
-            <div><strong data-testid="text-preview-sidebar-name">{sidebarName}</strong><span>{accountName ? 'Signed-in workspace · preview' : 'Workspace owner · preview'}</span></div>
-            <MoreHorizontal size={17} aria-hidden="true" />
-          </div>
-        </div>
-      </aside>
-      {mobileMenuOpen && <button className="apw-mobile-scrim" onClick={() => setMobileMenuOpen(false)} aria-label="Close navigation overlay" data-testid="button-navigation-scrim" />}
+        </aside>
+      )}
+      {!embedded && mobileMenuOpen && <button className="apw-mobile-scrim" onClick={() => setMobileMenuOpen(false)} aria-label="Close navigation overlay" data-testid="button-navigation-scrim" />}
 
-      <main className="apw-main">
-        <header className="apw-topbar">
+      <main className={`apw-main ${embedded ? 'apw-main-embedded' : ''}`}>
+        {!embedded && <header className="apw-topbar">
           <button className="apw-menu-toggle" onClick={() => setMobileMenuOpen(true)} aria-label="Open workspace navigation" data-testid="button-open-workspace-navigation"><Menu size={19} /></button>
           <div className="apw-breadcrumb"><span>ADPILOT</span><ChevronRight size={13} /><strong>{title}</strong></div>
           <div className="apw-topbar-right">
             <span className="apw-preview-state"><span />Preview mode</span>
             <button className="apw-help-button" onClick={() => notify('This workspace is a local-only product preview.')} aria-label="About the local preview" data-testid="button-preview-help"><CircleHelp size={17} /></button>
           </div>
-        </header>
-        <div className="apw-content">
+        </header>}
+        <div className={`apw-content ${embedded ? 'apw-content-embedded' : ''}`}>
           <div className="apw-demo-banner" role="note" data-testid="status-local-demo">
             <span className="apw-banner-symbol"><ShieldCheck size={15} /></span>
             <p><strong>Local-only preview</strong><span>Sample workspace data lives in this browser. External connections, money movement and publishing are unavailable.</span></p>
