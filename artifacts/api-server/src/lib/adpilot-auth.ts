@@ -30,6 +30,35 @@ export function isPlatformOwnerEmail(email: string): boolean {
   return Boolean(configured && configured === email.trim().toLowerCase());
 }
 
+export async function getBusinessAccess(businessId: number): Promise<{
+  status: "pending" | "active" | "suspended";
+  monthlyGenerationLimit: number;
+}> {
+  await ensureAdpilotSchema();
+  const pool = getMysqlPool();
+  await pool.execute(
+    `UPDATE adpilot_business_access
+     SET status = 'active'
+     WHERE business_id = ? AND status = 'pending'`,
+    [businessId],
+  );
+  const [rows] = await pool.execute<
+    (RowDataPacket & {
+      status: "pending" | "active" | "suspended";
+      monthlyGenerationLimit: number;
+    })[]
+  >(
+    `SELECT status, monthly_generation_limit AS monthlyGenerationLimit
+     FROM adpilot_business_access WHERE business_id = ? LIMIT 1`,
+    [businessId],
+  );
+  const access = rows[0];
+  return {
+    status: access?.status ?? "active",
+    monthlyGenerationLimit: Number(access?.monthlyGenerationLimit ?? 30),
+  };
+}
+
 export async function getAdpilotContext(
   req: Request,
   res: Response,
@@ -48,24 +77,12 @@ export async function getAdpilotContext(
       return null;
     }
     const isPlatformOwner = isPlatformOwnerEmail(user.email);
-    const [rows] = await getMysqlPool().execute<
-      (RowDataPacket & {
-        status: "pending" | "active" | "suspended";
-        monthlyGenerationLimit: number;
-      })[]
-    >(
-      `SELECT status, monthly_generation_limit AS monthlyGenerationLimit
-       FROM adpilot_business_access WHERE business_id = ? LIMIT 1`,
-      [user.businessId],
-    );
-    const access = rows[0];
-    const businessStatus = access?.status ?? "active";
-    const monthlyGenerationLimit = Number(access?.monthlyGenerationLimit ?? 30);
-    if (!options.allowInactive && businessStatus !== "active" && !isPlatformOwner) {
+    const access = await getBusinessAccess(user.businessId);
+    const businessStatus = access.status;
+    const monthlyGenerationLimit = access.monthlyGenerationLimit;
+    if (!options.allowInactive && businessStatus === "suspended" && !isPlatformOwner) {
       res.status(403).json({
-        error: businessStatus === "pending"
-          ? "Your workspace is waiting for owner activation."
-          : "This workspace is suspended. Contact the service owner.",
+        error: "This workspace is suspended. Contact the service owner.",
       });
       return null;
     }

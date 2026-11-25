@@ -121,7 +121,7 @@ const statements = [
 async function applySchema(pool: Pool): Promise<void> {
   for (const statement of statements) await pool.query(statement);
   // Existing businesses keep access after this feature is added. New
-  // registrations are explicitly inserted as pending in the auth route.
+  // registrations are explicitly inserted as active in the auth route.
   await pool.query(
     `INSERT IGNORE INTO adpilot_business_access
       (business_id, status, plan, monthly_generation_limit)

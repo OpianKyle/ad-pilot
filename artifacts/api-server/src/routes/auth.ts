@@ -21,7 +21,7 @@ import {
   verifyCsrf,
 } from "../lib/mysql";
 import { ensureAdpilotSchema } from "../lib/adpilot-schema";
-import { isPlatformOwnerEmail } from "../lib/adpilot-auth";
+import { getBusinessAccess, isPlatformOwnerEmail } from "../lib/adpilot-auth";
 
 const router: IRouter = Router();
 
@@ -42,14 +42,8 @@ function databaseUnavailable(res: Response): void {
 async function businessStatus(
   businessId: number,
 ): Promise<"pending" | "active" | "suspended"> {
-  await ensureAdpilotSchema();
-  const [rows] = await getMysqlPool().execute<
-    (RowDataPacket & { status: "pending" | "active" | "suspended" })[]
-  >(
-    "SELECT status FROM adpilot_business_access WHERE business_id = ? LIMIT 1",
-    [businessId],
-  );
-  return rows[0]?.status ?? "active";
+  const access = await getBusinessAccess(businessId);
+  return access.status;
 }
 
 function logFailure(req: Request, error: unknown, action: string): void {
@@ -156,7 +150,7 @@ router.post("/auth/register", async (req, res): Promise<void> => {
       await connection.execute(
         `INSERT INTO adpilot_business_access
           (business_id, status, plan, monthly_generation_limit)
-         VALUES (?, 'pending', 'Pilot', 30)`,
+         VALUES (?, 'active', 'Pilot', 30)`,
         [businessId],
       );
       await connection.commit();
@@ -179,7 +173,7 @@ router.post("/auth/register", async (req, res): Promise<void> => {
           name: input.name,
           email: input.email,
           role: "owner",
-          workspaceStatus: "pending",
+          workspaceStatus: "active",
         },
       }),
     );
@@ -231,11 +225,9 @@ router.post("/auth/login", async (req, res): Promise<void> => {
       return;
     }
     const workspaceStatus = await businessStatus(Number(row.businessId));
-    if (workspaceStatus !== "active" && !isPlatformOwnerEmail(row.email)) {
+    if (workspaceStatus === "suspended" && !isPlatformOwnerEmail(row.email)) {
       res.status(403).json({
-        error: workspaceStatus === "pending"
-          ? "Your workspace is waiting for owner activation."
-          : "This workspace is suspended. Contact the service owner.",
+        error: "This workspace is suspended. Contact the service owner.",
       });
       return;
     }
