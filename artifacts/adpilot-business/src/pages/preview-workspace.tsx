@@ -350,7 +350,7 @@ function LocalOnlyNote({ children = 'Local demo only · nothing is sent to a pla
   return <div className="apw-local-note"><ShieldCheck size={14} /><span>{children}</span></div>;
 }
 
-export default function PreviewWorkspace() {
+export default function PreviewWorkspace({ accountName }: { accountName?: string } = {}) {
   const [section, setSection] = useState<Section>('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [drafts, setDrafts] = useState<Draft[]>(() => readLocal('drafts', starterDrafts));
@@ -598,6 +598,10 @@ export default function PreviewWorkspace() {
     : section === 'planner'
       ? <AppButton kind="outline" testId="button-planner-create" onClick={() => navigate('studio')}><Plus size={15} /> Add a draft</AppButton>
       : undefined;
+  const sidebarName = accountName ?? settings.adviser;
+  const sidebarInitials = accountName
+    ? accountName.trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase() ?? '').join('')
+    : 'ME';
 
   return (
     <div className="apw-root" style={{ '--apw-brand': settings.brandColor } as CSSProperties}>
@@ -608,7 +612,7 @@ export default function PreviewWorkspace() {
           <span className="apw-wordmark">adpilot<span>.</span></span>
           <button className="apw-mobile-close" onClick={() => setMobileMenuOpen(false)} aria-label="Close navigation" data-testid="button-close-workspace-navigation"><X size={18} /></button>
         </div>
-        <div className="apw-demo-pill"><span />LOCAL DEMO</div>
+        <div className="apw-demo-pill"><span />{accountName ? 'SECTION PREVIEW' : 'LOCAL DEMO'}</div>
         <nav className="apw-nav">
           {(['Workspace', 'Campaigns', 'Business'] as const).map((group) => (
             <div className="apw-nav-group" key={group}>
@@ -634,10 +638,10 @@ export default function PreviewWorkspace() {
             <p>Your work stays here until you decide what to do next.</p>
             <span>NO CONNECTIONS · NO PUBLISHING</span>
           </div>
-          <Link href="/" className="nav-item" data-testid="link-exit-preview"><ArrowDownRight size={16} /><span>Return to the sign-in page</span></Link>
+          <Link href="/" className="nav-item" data-testid="link-exit-preview"><ArrowDownRight size={16} /><span>{accountName ? 'Return to overview' : 'Return to the sign-in page'}</span></Link>
           <div className="apw-user-chip">
-            <div className="apw-avatar">ME</div>
-            <div><strong>{settings.adviser}</strong><span>Workspace owner · preview</span></div>
+            <div className="apw-avatar">{sidebarInitials}</div>
+            <div><strong data-testid="text-preview-sidebar-name">{sidebarName}</strong><span>{accountName ? 'Signed-in workspace · preview' : 'Workspace owner · preview'}</span></div>
             <MoreHorizontal size={17} aria-hidden="true" />
           </div>
         </div>

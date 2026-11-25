@@ -32,6 +32,7 @@ import {
   Radio,
   Search,
   Send,
+  Sparkles,
   X,
 } from 'lucide-react';
 import { Link, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
@@ -88,6 +89,7 @@ function AppFrame() {
   const mysqlSetupNeeded =
     httpStatus(current.error) === 503 || httpStatus(csrf.error) === 503;
   const isAuthRoute = location === '/login' || location === '/register';
+  const isWorkspaceSectionsRoute = location === '/workspace-sections';
 
   useEffect(() => {
     setMobileNav(false);
@@ -103,6 +105,22 @@ function AppFrame() {
       },
     });
   };
+
+  if (isWorkspaceSectionsRoute) {
+    if (current.isLoading) return <WorkspaceLoading />;
+    if (!user) {
+      return (
+        <Unauthenticated
+          currentError={
+            current.isError && httpStatus(current.error) !== 401
+              ? messageFrom(current.error, 'We couldn’t check your session. Please sign in to continue.')
+              : null
+          }
+        />
+      );
+    }
+    return <PreviewWorkspace accountName={user.name} />;
+  }
 
   return (
     <div className="min-h-[100dvh] bg-[#f5f3ec] text-[#28323a]">
@@ -127,6 +145,7 @@ function AppFrame() {
                 <div className="apw-nav-heading">Workspace</div>
                 <Link href="/" className={`apw-nav-item ${location === '/' ? 'apw-nav-selected' : ''}`} aria-current={location === '/' ? 'page' : undefined} data-testid="link-dashboard"><LayoutDashboard size={17} strokeWidth={1.8} /><span>Overview</span></Link>
                 <Link href="/campaigns" className={`apw-nav-item ${location === '/campaigns' ? 'apw-nav-selected' : ''}`} aria-current={location === '/campaigns' ? 'page' : undefined} data-testid="link-campaigns"><FileText size={17} strokeWidth={1.8} /><span>Campaigns</span></Link>
+                {user && <Link href="/workspace-sections" className={`apw-nav-item ${isWorkspaceSectionsRoute ? 'apw-nav-selected' : ''}`} aria-current={isWorkspaceSectionsRoute ? 'page' : undefined} data-testid="link-workspace-sections"><Sparkles size={17} strokeWidth={1.8} /><span>Workspace sections</span></Link>}
               </div>
             </nav>
             <div className="apw-sidebar-bottom">
