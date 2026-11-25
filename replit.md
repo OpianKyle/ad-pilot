@@ -4,14 +4,15 @@ AdPilot Business is a web workspace for business owners to create and organize s
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm install --frozen-lockfile` — install the workspace dependencies
+- `pnpm --filter @workspace/api-server run dev` — run the API server (port 8080, routed under `/api`)
 - `pnpm --filter @workspace/adpilot-business run dev` — run the web app
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - Required shared environment values: `MYSQL_HOST`, `MYSQL_DATABASE`, `MYSQL_USER`, and the `MYSQL_PASSWORD` secret
 - Optional environment values: `MYSQL_PORT` (defaults to `3306`), `MYSQL_SSL` (TLS is on by default; set to `false` only if the database cannot use TLS)
-- Import the supplied MySQL schema for `businesses`, `users`, and `campaigns` before using the app. The API creates its `adpilot_sessions` table on first use.
+- The MySQL database must contain the `businesses`, `users`, and `campaigns` tables before account and campaign features can be used. No SQL dump is included in this repository. The API creates its `adpilot_sessions` table on first use.
 
 ## Stack
 
@@ -29,7 +30,6 @@ AdPilot Business is a web workspace for business owners to create and organize s
 - `artifacts/api-server/src/routes/` — account and campaign API routes
 - `artifacts/api-server/src/lib/mysql.ts` — MySQL connection and session handling
 - `lib/api-spec/openapi.yaml` — source of truth for API contracts
-- `attached_assets/schema_1795513164036.sql` — original business, user, and campaign table schema
 
 ## Architecture decisions
 
