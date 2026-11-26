@@ -2,10 +2,10 @@ import { randomBytes } from "node:crypto";
 import { Router, type IRouter, type Request, type Response } from "express";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import {
-  ScheduledPost,
-  ScheduledPostInput,
-  ScheduledPostList,
-  OkResponse,
+  CancelAdpilotScheduledPostResponse,
+  CreateAdpilotScheduledPostBody,
+  CreateAdpilotScheduledPostResponse,
+  ListAdpilotScheduledPostsResponse,
 } from "@workspace/api-zod";
 import {
   getAdpilotContext,
@@ -73,7 +73,7 @@ function toIso(value: Date | string): string {
 }
 
 function toPost(row: PostRow) {
-  return ScheduledPost.parse({
+  return CreateAdpilotScheduledPostResponse.parse({
     id: row.id,
     status: row.status,
     caption: row.caption,
@@ -127,7 +127,7 @@ router.get("/adpilot/posts", async (req, res): Promise<void> => {
        LIMIT 100`,
       [context.user.businessId],
     );
-    res.json(ScheduledPostList.parse({ posts: rows.map(toPost) }));
+    res.json(ListAdpilotScheduledPostsResponse.parse({ posts: rows.map(toPost) }));
   } catch (error) {
     logFailure(req, error, "list");
     databaseUnavailable(res);
@@ -143,7 +143,7 @@ router.post("/adpilot/posts", async (req, res): Promise<void> => {
     if (!(await requireAdpilotCsrf(req, res))) return;
     const context = await getAdpilotContext(req, res);
     if (!context) return;
-    const parsed = ScheduledPostInput.safeParse(req.body);
+    const parsed = CreateAdpilotScheduledPostBody.safeParse(req.body);
     if (!parsed.success) {
       res.status(422).json({ error: "Choose a photo, caption, time, and at least one channel." });
       return;
@@ -169,15 +169,16 @@ router.post("/adpilot/posts", async (req, res): Promise<void> => {
       res.status(409).json({ error: "Connect a Meta account before scheduling posts." });
       return;
     }
-    const selectedPage = credentials.pages.find(
+    const selectedFacebookPage = credentials.pages.find(
       (page) => page.id === credentials.selectedFacebookPageId,
     );
-    const selectedInstagram = selectedPage?.instagramAccount;
+    const selectedInstagramPage = credentials.pages.find(
+      (page) => page.instagramAccount?.id === credentials.selectedInstagramAccountId,
+    );
     if (
-      (parsed.data.platforms.includes("facebook") && !selectedPage) ||
+      (parsed.data.platforms.includes("facebook") && !selectedFacebookPage) ||
       (parsed.data.platforms.includes("instagram") &&
-        (!selectedInstagram ||
-          selectedInstagram.id !== credentials.selectedInstagramAccountId))
+        !selectedInstagramPage)
     ) {
       res.status(422).json({ error: "Connect and select the requested publishing destinations first." });
       return;
@@ -195,8 +196,9 @@ router.post("/adpilot/posts", async (req, res): Promise<void> => {
     const id = randomBytes(16).toString("hex");
     await getMysqlPool().execute(
       `INSERT INTO adpilot_meta_posts
-        (id, business_id, caption, hashtags, asset_id, scheduled_at, platforms, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'scheduled')`,
+        (id, business_id, caption, hashtags, asset_id, scheduled_at, platforms,
+         facebook_page_id, instagram_account_id, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'scheduled')`,
       [
         id,
         context.user.businessId,
@@ -205,6 +207,12 @@ router.post("/adpilot/posts", async (req, res): Promise<void> => {
         parsed.data.assetId,
         scheduledAt,
         JSON.stringify(parsed.data.platforms),
+        parsed.data.platforms.includes("facebook")
+          ? credentials.selectedFacebookPageId
+          : null,
+        parsed.data.platforms.includes("instagram")
+          ? credentials.selectedInstagramAccountId
+          : null,
       ],
     );
     const [rows] = await getMysqlPool().execute<PostRow[]>(
@@ -277,7 +285,7 @@ router.delete("/adpilot/posts/:id", async (req, res): Promise<void> => {
       res.status(409).json({ error: "Publishing has already started or this post is no longer scheduled." });
       return;
     }
-    res.json(OkResponse.parse({ ok: true }));
+    res.json(CancelAdpilotScheduledPostResponse.parse({ ok: true }));
   } catch (error) {
     logFailure(req, error, "cancellation");
     databaseUnavailable(res);

@@ -648,12 +648,7 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: object
-              properties:
-                signed_request:
-                  type: string
-                  maxLength: 12000
-              required: [signed_request]
+              $ref: "#/components/schemas/MetaDataDeletionInput"
       responses:
         "200":
           description: Deletion receipt and status URL
@@ -1406,19 +1401,22 @@ components:
       type: object
       properties:
         facebookPageId:
-          type: [string, "null"]
+          type: string
+          minLength: 1
           maxLength: 120
         instagramAccountId:
-          type: [string, "null"]
+          type: string
+          minLength: 1
           maxLength: 120
-      required: [facebookPageId, instagramAccountId]
       anyOf:
         - properties:
             facebookPageId:
               type: string
+          required: [facebookPageId]
         - properties:
             instagramAccountId:
               type: string
+          required: [instagramAccountId]
     ScheduledPostInput:
       type: object
       properties:
@@ -1524,6 +1522,13 @@ components:
           type: string
           format: date-time
       required: [status, requestedAt]
+    MetaDataDeletionInput:
+      type: object
+      properties:
+        signed_request:
+          type: string
+          maxLength: 12000
+      required: [signed_request]
     AdminAccount:
       type: object
       properties:

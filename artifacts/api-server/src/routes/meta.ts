@@ -2,11 +2,11 @@ import { createHash, randomBytes } from "node:crypto";
 import { Router, type IRouter, type Request, type Response } from "express";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import {
-  MetaConnectionStatus,
-  MetaDeletionReceipt,
-  MetaDeletionStatus,
-  MetaAssetSelectionInput,
-  OkResponse,
+  DisconnectAdpilotMetaResponse,
+  GetAdpilotMetaConnectionResponse,
+  GetMetaDataDeletionStatusResponse,
+  ReceiveMetaDataDeletionRequestResponse,
+  SelectAdpilotMetaAssetsBody,
 } from "@workspace/api-zod";
 import {
   currentUserForSession,
@@ -86,7 +86,7 @@ function connectionStatus(
   const selectedInstagram = credentials?.pages.find(
     (page) => page.instagramAccount?.id === credentials.selectedInstagramAccountId,
   )?.instagramAccount;
-  return MetaConnectionStatus.parse({
+  return GetAdpilotMetaConnectionResponse.parse({
     connected: Boolean(credentials),
     connectedAt: credentials?.connectedAt ?? null,
     facebookPageId: selectedPage?.id ?? null,
@@ -192,13 +192,12 @@ router.post("/adpilot/oauth/:provider/start", async (req, res): Promise<void> =>
     await getMysqlPool().execute(
       `INSERT INTO adpilot_oauth_states
         (state_hash, business_id, user_id, provider, expires_at)
-       VALUES (?, ?, ?, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? MINUTE))`,
+       VALUES (?, ?, ?, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL ${OAUTH_STATE_TTL_MINUTES} MINUTE))`,
       [
         createHash("sha256").update(state).digest("hex"),
         context.user.businessId,
         context.user.id,
         META_PROVIDER,
-        OAUTH_STATE_TTL_MINUTES,
       ],
     );
     const url = buildMetaAuthorizationUrl(state, redirectUri);
@@ -325,7 +324,7 @@ router.put("/adpilot/connections/meta/select", async (req, res): Promise<void> =
     }
     const context = await getAdpilotContext(req, res);
     if (!context) return;
-    const parsed = MetaAssetSelectionInput.safeParse(req.body);
+    const parsed = SelectAdpilotMetaAssetsBody.safeParse(req.body);
     if (!parsed.success) {
       res.status(422).json({ error: "Choose at least one Facebook or Instagram destination." });
       return;
@@ -335,31 +334,28 @@ router.put("/adpilot/connections/meta/select", async (req, res): Promise<void> =
       res.status(409).json({ error: "Connect a Meta account before choosing destinations." });
       return;
     }
-    const { facebookPageId, instagramAccountId } = parsed.data;
-    const pageForInstagram = instagramAccountId
-      ? credentials.pages.find((page) => page.instagramAccount?.id === instagramAccountId)
-      : undefined;
-    if (instagramAccountId && !pageForInstagram) {
-      res.status(422).json({ error: "That Instagram account is no longer shared with this Meta app." });
+    const facebookPageId = parsed.data.facebookPageId?.trim() || null;
+    const instagramAccountId = parsed.data.instagramAccountId?.trim() || null;
+    if (!facebookPageId && !instagramAccountId) {
+      res.status(422).json({ error: "Choose at least one Facebook or Instagram destination." });
       return;
     }
-    const pageId = facebookPageId ?? pageForInstagram?.id ?? null;
-    const selectedPage = pageId
-      ? credentials.pages.find((page) => page.id === pageId)
+    const selectedFacebookPage = facebookPageId
+      ? credentials.pages.find((page) => page.id === facebookPageId)
       : undefined;
-    if (pageId && !selectedPage) {
+    if (facebookPageId && !selectedFacebookPage) {
       res.status(422).json({ error: "That Facebook Page is no longer shared with this Meta app." });
       return;
     }
-    if (
-      instagramAccountId &&
-      selectedPage?.instagramAccount?.id !== instagramAccountId
-    ) {
-      res.status(422).json({ error: "Choose the Instagram account linked to the selected Facebook Page." });
+    const selectedInstagramPage = instagramAccountId
+      ? credentials.pages.find((page) => page.instagramAccount?.id === instagramAccountId)
+      : undefined;
+    if (instagramAccountId && !selectedInstagramPage) {
+      res.status(422).json({ error: "That Instagram account is no longer shared with this Meta app." });
       return;
     }
-    credentials.selectedFacebookPageId = pageId;
-    credentials.selectedInstagramAccountId = instagramAccountId;
+    credentials.selectedFacebookPageId = facebookPageId;
+    credentials.selectedInstagramAccountId = instagramAccountId ?? null;
     await getMysqlPool().execute(
       `UPDATE adpilot_provider_vault SET encrypted_payload = ?
        WHERE business_id = ? AND provider = ?`,
@@ -420,7 +416,7 @@ router.delete("/adpilot/connections/meta", async (req, res): Promise<void> => {
     } finally {
       connection.release();
     }
-    res.json(OkResponse.parse({ ok: true }));
+    res.json(DisconnectAdpilotMetaResponse.parse({ ok: true }));
   } catch (error) {
     logFailure(req, error, "disconnect");
     databaseUnavailable(res);
@@ -477,10 +473,10 @@ router.post("/meta/data-deletion", async (req, res): Promise<void> => {
         );
         await connection.execute(
           `UPDATE adpilot_meta_posts
-           SET status = IF(status = 'scheduled', 'cancelled', status),
+           SET error = IF(status = 'scheduled', 'The connected Meta account requested data deletion.', error),
+               status = IF(status = 'scheduled', 'cancelled', status),
                facebook_remote_id = NULL,
-               instagram_remote_id = NULL,
-               error = IF(status = 'scheduled', 'The connected Meta account requested data deletion.', error)
+               instagram_remote_id = NULL
            WHERE business_id IN (${placeholders})`,
           businessIds,
         );
@@ -498,7 +494,7 @@ router.post("/meta/data-deletion", async (req, res): Promise<void> => {
       connection.release();
     }
     res.json(
-      MetaDeletionReceipt.parse({
+      ReceiveMetaDataDeletionRequestResponse.parse({
         url: new URL(`/api/meta/data-deletion/${code}`, baseUrl).toString(),
         confirmation_code: code,
       }),
@@ -539,7 +535,7 @@ router.get("/meta/data-deletion/:code", async (req, res): Promise<void> => {
         ? request.requestedAt.toISOString()
         : new Date(`${request.requestedAt}Z`).toISOString();
     res.json(
-      MetaDeletionStatus.parse({
+      GetMetaDataDeletionStatusResponse.parse({
         status: "completed",
         requestedAt,
       }),

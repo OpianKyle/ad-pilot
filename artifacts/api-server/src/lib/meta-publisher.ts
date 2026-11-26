@@ -1,5 +1,6 @@
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { decryptProviderPayload } from "./adpilot-credentials";
+import { ensureAdpilotSchema } from "./adpilot-schema";
 import { getMysqlPool, isMysqlConfigured } from "./mysql";
 import { signedPrivateReadUrl } from "./adpilot-storage";
 import { logger } from "./logger";
@@ -19,6 +20,8 @@ interface DuePostRow extends RowDataPacket {
   hashtags: string;
   assetId: string;
   platforms: unknown;
+  facebookPageId: string | null;
+  instagramAccountId: string | null;
 }
 
 interface CredentialRow extends RowDataPacket {
@@ -56,7 +59,9 @@ async function claimNextDuePost(): Promise<DuePostRow | null> {
     await connection.beginTransaction();
     const [rows] = await connection.execute<DuePostRow[]>(
       `SELECT id, business_id AS businessId, caption, hashtags,
-              asset_id AS assetId, platforms
+              asset_id AS assetId, platforms,
+              facebook_page_id AS facebookPageId,
+              instagram_account_id AS instagramAccountId
        FROM adpilot_meta_posts
        WHERE status = 'scheduled' AND scheduled_at <= UTC_TIMESTAMP()
        ORDER BY scheduled_at ASC
@@ -126,20 +131,18 @@ async function publishPost(post: DuePostRow): Promise<void> {
   const credentials = parseMetaCredentialPayload(
     decryptProviderPayload(post.businessId, "meta", encrypted),
   );
-  const selectedPage = credentials.pages.find(
-    (page) => page.id === credentials.selectedFacebookPageId,
+  const facebookPage = credentials.pages.find(
+    (page) => page.id === post.facebookPageId,
   );
-  const needsPage =
-    platforms.includes("facebook") || platforms.includes("instagram");
-  if (needsPage && !selectedPage) {
-    await setPostFailed(post, "No Facebook Page is selected. Choose a destination and schedule this post again.");
+  const instagramPage = credentials.pages.find(
+    (page) => page.instagramAccount?.id === post.instagramAccountId,
+  );
+  if (platforms.includes("facebook") && !facebookPage) {
+    await setPostFailed(post, "The scheduled Facebook Page is no longer available. Reconnect and schedule this post again.");
     return;
   }
-  if (
-    platforms.includes("instagram") &&
-    selectedPage?.instagramAccount?.id !== credentials.selectedInstagramAccountId
-  ) {
-    await setPostFailed(post, "The selected Instagram account is no longer linked. Reconnect and schedule this post again.");
+  if (platforms.includes("instagram") && !instagramPage) {
+    await setPostFailed(post, "The scheduled Instagram account is no longer available. Reconnect and schedule this post again.");
     return;
   }
   const [assets] = await getMysqlPool().execute<AssetRow[]>(
@@ -167,9 +170,9 @@ async function publishPost(post: DuePostRow): Promise<void> {
 
   for (const platform of platforms) {
     try {
-      if (platform === "facebook" && selectedPage) {
+      if (platform === "facebook" && facebookPage) {
         const remoteId = await publishFacebookPhoto({
-          page: selectedPage,
+          page: facebookPage,
           imageUrl,
           caption,
         });
@@ -179,9 +182,9 @@ async function publishPost(post: DuePostRow): Promise<void> {
            WHERE id = ? AND business_id = ?`,
           [remoteId, post.id, post.businessId],
         );
-      } else if (platform === "instagram" && selectedPage) {
+      } else if (platform === "instagram" && instagramPage) {
         const remoteId = await publishInstagramPhoto({
-          page: selectedPage,
+          page: instagramPage,
           imageUrl,
           caption,
         });
@@ -238,6 +241,7 @@ export function startMetaPublisherWorker(): void {
     workerRunning = true;
     void (async () => {
       try {
+        await ensureAdpilotSchema();
         for (let count = 0; count < 5; count += 1) {
           const post = await claimNextDuePost();
           if (!post) break;

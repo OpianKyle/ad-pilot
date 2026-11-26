@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowRight,
@@ -28,7 +28,7 @@ function errorMessage(error: unknown): string {
   return "The request could not be completed. Try again.";
 }
 
-function csrfHeaders(token: string | undefined) {
+function csrfHeaders(token: string | undefined): Record<string, string> {
   return token ? { "X-CSRF-Token": token } : {};
 }
 
@@ -80,16 +80,6 @@ export default function MetaChannelsPage() {
     setInstagramAccountId(status.instagramAccountId ?? "");
   }, [connection.data]);
 
-  const availableInstagramAccounts = useMemo(() => {
-    const page = connection.data?.availableFacebookPages.find(
-      (candidate) => candidate.id === facebookPageId,
-    );
-    if (!page) return [];
-    return (connection.data?.availableInstagramAccounts ?? []).filter((account) =>
-      account.name.endsWith(`· ${page.name}`),
-    );
-  }, [connection.data, facebookPageId]);
-
   function connectMeta() {
     setNotice("");
     start.mutate(
@@ -103,13 +93,18 @@ export default function MetaChannelsPage() {
 
   function saveDestinations(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!facebookPageId && !instagramAccountId) {
+      setNotice("Choose at least one Facebook or Instagram destination.");
+      return;
+    }
+    const destinations =
+      facebookPageId && instagramAccountId
+        ? { facebookPageId, instagramAccountId }
+        : facebookPageId
+          ? { facebookPageId }
+          : { instagramAccountId };
     select.mutate(
-      {
-        data: {
-          facebookPageId: facebookPageId || null,
-          instagramAccountId: instagramAccountId || null,
-        },
-      },
+      { data: destinations },
       {
         onSuccess: (status: MetaConnectionStatus) => {
           queryClient.setQueryData(getGetAdpilotMetaConnectionQueryKey(), status);
@@ -235,7 +230,7 @@ export default function MetaChannelsPage() {
                   <div className="apw-overline">PUBLISHING DESTINATIONS</div>
                   <h2 className="mt-1 font-display text-xl font-bold text-[#344139]">Choose where this business can publish.</h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-[#788278]">
-                    Instagram publishing requires a professional account linked to the selected Facebook Page. You can save a Page alone or select both channels.
+                    Instagram uses the professional account linked to its own Page. Choose Facebook and Instagram destinations independently.
                   </p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
@@ -244,18 +239,7 @@ export default function MetaChannelsPage() {
                     <select
                       className="form-input"
                       value={facebookPageId}
-                      onChange={(event) => {
-                        setFacebookPageId(event.target.value);
-                        const nextPage = status?.availableFacebookPages.find((page) => page.id === event.target.value);
-                        const firstLinkedAccount = status?.availableInstagramAccounts.find((account) =>
-                          account.name.endsWith(`· ${nextPage?.name ?? ""}`),
-                        );
-                        setInstagramAccountId(
-                          firstLinkedAccount?.id === status?.instagramAccountId
-                            ? status.instagramAccountId
-                            : "",
-                        );
-                      }}
+                      onChange={(event) => setFacebookPageId(event.target.value)}
                       data-testid="select-meta-facebook-page"
                     >
                       <option value="">Don’t publish to Facebook</option>
@@ -270,16 +254,16 @@ export default function MetaChannelsPage() {
                       className="form-input"
                       value={instagramAccountId}
                       onChange={(event) => setInstagramAccountId(event.target.value)}
-                      disabled={!facebookPageId || availableInstagramAccounts.length === 0}
+                      disabled={(status?.availableInstagramAccounts.length ?? 0) === 0}
                       data-testid="select-meta-instagram-account"
                     >
                       <option value="">Don’t publish to Instagram</option>
-                      {availableInstagramAccounts.map((account) => (
-                        <option value={account.id} key={account.id}>{account.name.split(" · ")[0]}</option>
+                      {(status?.availableInstagramAccounts ?? []).map((account) => (
+                        <option value={account.id} key={account.id}>{account.name}</option>
                       ))}
                     </select>
-                    {facebookPageId && availableInstagramAccounts.length === 0 && (
-                      <span className="mt-1 block text-xs font-normal text-[#8b9289]">No linked professional account was shared for this Page.</span>
+                    {(status?.availableInstagramAccounts.length ?? 0) === 0 && (
+                      <span className="mt-1 block text-xs font-normal text-[#8b9289]">No linked professional Instagram accounts were shared with this app.</span>
                     )}
                   </label>
                 </div>

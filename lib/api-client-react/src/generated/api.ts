@@ -56,6 +56,7 @@ import type {
   MediaUploadResponse,
   MetaAssetSelectionInput,
   MetaConnectionStatus,
+  MetaDataDeletionInput,
   MetaDeletionReceipt,
   MetaDeletionStatus,
   OAuthStartResponse,
@@ -67,7 +68,6 @@ import type {
   PasswordResetLink,
   ProviderCredentialsInput,
   ProviderStatus,
-  ReceiveMetaDataDeletionRequestBody,
   RegistrationInput,
   ScheduleInput,
   ScheduledPost,
@@ -3627,9 +3627,9 @@ export const getReceiveMetaDataDeletionRequestUrl = () => {
 /**
  * @summary Verify and process Meta's signed data-deletion request
  */
-export const receiveMetaDataDeletionRequest = async (receiveMetaDataDeletionRequestBody: ReceiveMetaDataDeletionRequestBody, options?: Parameters<typeof customFetch>[1]): Promise<MetaDeletionReceipt> => {
+export const receiveMetaDataDeletionRequest = async (metaDataDeletionInput: MetaDataDeletionInput, options?: Parameters<typeof customFetch>[1]): Promise<MetaDeletionReceipt> => {
     const formUrlEncoded = new URLSearchParams();
-formUrlEncoded.append(`signed_request`, receiveMetaDataDeletionRequestBody.signed_request);
+formUrlEncoded.append(`signed_request`, metaDataDeletionInput.signed_request);
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -3688,9 +3688,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ReceiveMetaDataDeletionRequestMutationResult = NonNullable<Awaited<ReturnType<typeof receiveMetaDataDeletionRequest>>>
-    export type ReceiveMetaDataDeletionRequestMutationBody = BodyType<ReceiveMetaDataDeletionRequestBody>
+    export type ReceiveMetaDataDeletionRequestMutationBody = BodyType<MetaDataDeletionInput>
     export type ReceiveMetaDataDeletionRequestMutationError = ErrorType<void>
-    export type ReceiveMetaDataDeletionRequestMutationVariables = {data: BodyType<ReceiveMetaDataDeletionRequestBody>}
+    export type ReceiveMetaDataDeletionRequestMutationVariables = {data: BodyType<MetaDataDeletionInput>}
 
     /**
  * @summary Verify and process Meta's signed data-deletion request

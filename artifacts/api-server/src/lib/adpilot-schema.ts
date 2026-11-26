@@ -1,4 +1,4 @@
-import type { Pool } from "mysql2/promise";
+import type { Pool, RowDataPacket } from "mysql2/promise";
 import { getMysqlPool } from "./mysql";
 
 let schemaReady: Promise<void> | undefined;
@@ -115,6 +115,8 @@ const statements = [
     asset_id CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
     scheduled_at DATETIME NOT NULL,
     platforms JSON NOT NULL,
+    facebook_page_id VARCHAR(120) NULL,
+    instagram_account_id VARCHAR(120) NULL,
     status ENUM('scheduled','publishing','published','needs_attention','cancelled') NOT NULL DEFAULT 'scheduled',
     facebook_state VARCHAR(32) NULL,
     instagram_state VARCHAR(32) NULL,
@@ -149,8 +151,52 @@ const statements = [
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
 ];
 
+interface ColumnRow extends RowDataPacket {
+  columnName: string;
+}
+
+async function ensurePostTargetColumns(pool: Pool): Promise<void> {
+  const [rows] = await pool.execute<ColumnRow[]>(
+    `SELECT COLUMN_NAME AS columnName
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = ?
+       AND COLUMN_NAME IN (?, ?)`,
+    ["adpilot_meta_posts", "facebook_page_id", "instagram_account_id"],
+  );
+  const existing = new Set(rows.map((row) => row.columnName));
+  for (const [column, definition] of [
+    ["facebook_page_id", "VARCHAR(120) NULL"],
+    ["instagram_account_id", "VARCHAR(120) NULL"],
+  ] as const) {
+    if (existing.has(column)) continue;
+    try {
+      await pool.query(
+        `ALTER TABLE adpilot_meta_posts ADD COLUMN ${column} ${definition}`,
+      );
+    } catch (error) {
+      const code =
+        error && typeof error === "object" && "code" in error
+          ? error.code
+          : undefined;
+      if (code !== "ER_DUP_FIELDNAME") throw error;
+    }
+  }
+  await pool.query(
+    `UPDATE adpilot_meta_posts
+     SET status = 'needs_attention',
+         facebook_state = IF(JSON_CONTAINS(platforms, JSON_QUOTE('facebook')), 'needs_attention', facebook_state),
+         instagram_state = IF(JSON_CONTAINS(platforms, JSON_QUOTE('instagram')), 'needs_attention', instagram_state),
+         error = 'Review the publishing destination and reschedule this post.'
+     WHERE status = 'scheduled'
+       AND ((JSON_CONTAINS(platforms, JSON_QUOTE('facebook')) AND facebook_page_id IS NULL)
+         OR (JSON_CONTAINS(platforms, JSON_QUOTE('instagram')) AND instagram_account_id IS NULL))`,
+  );
+}
+
 async function applySchema(pool: Pool): Promise<void> {
   for (const statement of statements) await pool.query(statement);
+  await ensurePostTargetColumns(pool);
   // Existing businesses keep access after this feature is added. New
   // registrations are explicitly inserted as active in the auth route.
   await pool.query(

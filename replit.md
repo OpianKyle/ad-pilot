@@ -11,8 +11,20 @@ AdPilot Business is a web workspace for business owners to create and organize s
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - Required shared environment values: `MYSQL_HOST`, `MYSQL_DATABASE`, `MYSQL_USER`, and the `MYSQL_PASSWORD` secret
+- Meta publishing uses `META_APP_ID`, `META_APP_SECRET`, and `SESSION_SECRET`, stored in Replit Secrets
+- Photo upload and publishing require private App Storage (`PRIVATE_OBJECT_DIR`)
 - Optional environment values: `MYSQL_PORT` (defaults to `3306`), `MYSQL_SSL` (TLS is on by default; set to `false` only if the database cannot use TLS)
 - The MySQL database must contain the `businesses`, `users`, and `campaigns` tables before account and campaign features can be used. No SQL dump is included in this repository. The API creates its `adpilot_sessions` table on first use.
+
+## Meta publishing setup
+
+- Configure Facebook Login for Web and Instagram Graph API in the Meta developer app.
+- Add `https://<public-app-host>/api/adpilot/oauth/meta/callback` as a valid OAuth redirect URI.
+- Set `https://<public-app-host>/api/meta/data-deletion` as the Meta data-deletion callback.
+- Requested permissions: `pages_show_list`, `pages_read_engagement`, `pages_manage_posts`, `instagram_basic`, and `instagram_content_publish`.
+- Public publishing requires Meta app review and advanced access for the requested permissions.
+- Each business authorizes its own account and selects its own Page and linked Instagram professional account. Scheduled posts retain the destinations selected when they were created.
+- Photo publishing currently supports JPEG and PNG images; video, Reels, and Stories are not included.
 
 ## Stack
 
@@ -41,7 +53,8 @@ AdPilot Business is a web workspace for business owners to create and organize s
 
 - Account registration and sign-in for a business owner
 - Campaign overview, campaign search, and draft creation
-- No social publishing, AI generation, billing, or platform integrations are included yet.
+- Facebook and Instagram photo publishing, scheduling, and per-business channel connections
+- No AI generation, billing, or campaign advertising integrations are included yet.
 
 ## User preferences
 

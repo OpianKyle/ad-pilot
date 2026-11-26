@@ -91,7 +91,7 @@ export function buildMetaAuthorizationUrl(state: string, redirectUri: string): s
   return url.toString();
 }
 
-async function graphRequest<T extends GraphErrorBody>(
+async function graphRequest<T>(
   path: string,
   method: "GET" | "POST",
   values: Record<string, string>,
@@ -120,9 +120,9 @@ async function graphRequest<T extends GraphErrorBody>(
   } catch {
     throw new MetaProviderError("Meta could not be reached. Try again in a moment.");
   }
-  let body: T;
+  let body: T & GraphErrorBody;
   try {
-    body = (await response.json()) as T;
+    body = (await response.json()) as T & GraphErrorBody;
   } catch {
     throw new MetaProviderError("Meta returned an unreadable response.");
   }

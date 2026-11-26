@@ -529,32 +529,32 @@ export interface MetaConnectionStatus {
 }
 
 export type MetaAssetSelectionInput = ({
+  facebookPageId: string;
+} & {
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
   facebookPageId?: string;
-} & ({
   /**
+     * @minLength 1
      * @maxLength 120
-     * @nullable
      */
-  facebookPageId: string | null;
-  /**
-     * @maxLength 120
-     * @nullable
-     */
-  instagramAccountId: string | null;
-})) | ({
   instagramAccountId?: string;
-} & ({
+}) | ({
+  instagramAccountId: string;
+} & {
   /**
+     * @minLength 1
      * @maxLength 120
-     * @nullable
      */
-  facebookPageId: string | null;
+  facebookPageId?: string;
   /**
+     * @minLength 1
      * @maxLength 120
-     * @nullable
      */
-  instagramAccountId: string | null;
-}));
+  instagramAccountId?: string;
+});
 
 export type ScheduledPostInputPlatformsItem = typeof ScheduledPostInputPlatformsItem[keyof typeof ScheduledPostInputPlatformsItem];
 
@@ -643,6 +643,11 @@ export const MetaDeletionStatusStatus = {
 export interface MetaDeletionStatus {
   status: MetaDeletionStatusStatus;
   requestedAt: string;
+}
+
+export interface MetaDataDeletionInput {
+  /** @maxLength 12000 */
+  signed_request: string;
 }
 
 export type AdminAccountStatus = typeof AdminAccountStatus[keyof typeof AdminAccountStatus];
@@ -805,10 +810,5 @@ export type CompleteAdpilotMetaOAuthParams = {
 code?: string;
 state?: string;
 error?: string;
-};
-
-export type ReceiveMetaDataDeletionRequestBody = {
-  /** @maxLength 12000 */
-  signed_request: string;
 };
 

@@ -45,6 +45,10 @@ function localDateTimeValue(date: Date) {
   return local.toISOString().slice(0, 16);
 }
 
+function csrfHeaders(token: string | undefined): Record<string, string> {
+  return token ? { 'X-CSRF-Token': token } : {};
+}
+
 function stateGroup(post: ScheduledPost): PostFilter {
   const status = String(post.status).toLowerCase();
   const channelStates = [post.facebookState, post.instagramState].filter(Boolean).map((state) => String(state).toLowerCase());
@@ -77,7 +81,7 @@ export default function PublishingPlannerPage() {
   });
   const secureRequest = {
     credentials: 'include' as const,
-    headers: csrf.data?.csrf ? { 'X-CSRF-Token': csrf.data.csrf } : {},
+    headers: csrfHeaders(csrf.data?.csrf),
   };
   const requestUpload = useRequestAdpilotAssetUpload({ request: secureRequest });
   const completeUpload = useCompleteAdpilotAssetUpload({ request: secureRequest });
