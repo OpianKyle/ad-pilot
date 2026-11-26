@@ -32,11 +32,44 @@ function validationError(res: import("express").Response): void {
   res.status(422).json({ error: "Check the creative details and try again." });
 }
 
+function providerStatus(error: unknown): number | undefined {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "status" in error &&
+    typeof error.status === "number"
+  ) {
+    return error.status;
+  }
+  return undefined;
+}
+
 function logProviderFailure(req: Request, provider: string, error: unknown): void {
+  const status = providerStatus(error);
   req.log.warn(
-    { provider, errorType: error instanceof Error ? error.name : "unknown" },
+    {
+      provider,
+      errorType: error instanceof Error ? error.name : "unknown",
+      ...(status === undefined ? {} : { providerStatus: status }),
+    },
     "AdPilot AI generation failed",
   );
+}
+
+function geminiFailureMessage(status: number | undefined): string {
+  if (status === 401 || status === 403) {
+    return "Gemini denied this request. Check the API key’s access and the project’s Gemini API permissions.";
+  }
+  if (status === 404) {
+    return "The configured Gemini model is unavailable to this project.";
+  }
+  if (status === 429) {
+    return "Gemini’s request limit or quota was reached. Wait before trying again or review the project quota.";
+  }
+  if (status === 400) {
+    return "Gemini rejected this request. Try a shorter brief and check the model’s API access.";
+  }
+  return "Gemini could not draft this post. Try again.";
 }
 
 function copyPrompt(input: {
@@ -97,7 +130,7 @@ router.post("/adpilot/ai/copy", generationLimit, async (req, res): Promise<void>
     res.json(response);
   } catch (error) {
     logProviderFailure(req, "Gemini", error);
-    res.status(502).json({ error: "Gemini could not draft this post. Try again." });
+    res.status(502).json({ error: geminiFailureMessage(providerStatus(error)) });
   }
 });
 
