@@ -116,7 +116,7 @@ router.post("/adpilot/ai/copy", generationLimit, async (req, res): Promise<void>
   try {
     const client = new GoogleGenAI({ apiKey });
     const result = await client.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.5-flash-lite",
       contents: copyPrompt(parsed.data),
       config: {
         responseMimeType: "application/json",
