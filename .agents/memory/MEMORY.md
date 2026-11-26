@@ -1,1 +1,2 @@
 - [AdPilot social account ownership](meta-account-ownership.md) — each business workspace connects its own Meta assets.
+- [Gemini provider choice](gemini-provider-choice.md) — use the user's server-side Gemini API key; do not retry managed setup without permission.

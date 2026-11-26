@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import {
   useCreateCampaign,
@@ -18,6 +18,7 @@ import NotFound from '@/pages/not-found';
 import PreviewWorkspace from '@/pages/preview-workspace';
 import MetaChannelsPage from '@/pages/meta-channels';
 import PublishingPlannerPage from '@/pages/publishing-planner';
+import type { ApprovedAiCreative } from '@/lib/creative-handoff';
 import { workspaceSections } from '@/lib/workspace-sections';
 import {
   ArrowDownRight,
@@ -86,6 +87,7 @@ function AppFrame() {
   const current = useGetCurrentUser({ request: { credentials: 'include' } });
   const logout = useLogoutAccount({ request: { credentials: 'include', headers: csrf.data?.csrf ? { 'X-CSRF-Token': csrf.data.csrf } : {} } });
   const [mobileNav, setMobileNav] = useState(false);
+  const [plannerDraft, setPlannerDraft] = useState<ApprovedAiCreative | null>(null);
   const queryClient = useQueryClient();
   const user = current.data?.user;
   const mysqlSetupNeeded =
@@ -98,6 +100,11 @@ function AppFrame() {
       ? activeWorkspaceSection
       : undefined;
   const selectedNavPath = location === '/campaigns' ? '/planner' : location;
+  const handleAiCreativeApproved = useCallback((draft: ApprovedAiCreative) => {
+    setPlannerDraft(draft);
+    setLocation('/planner');
+  }, [setLocation]);
+  const clearPlannerDraft = useCallback(() => setPlannerDraft(null), []);
 
   useEffect(() => {
     setMobileNav(false);
@@ -109,6 +116,7 @@ function AppFrame() {
         queryClient.setQueryData(userKey, undefined);
         queryClient.removeQueries({ queryKey: summaryKey });
         queryClient.removeQueries({ queryKey: campaignsKey });
+        setPlannerDraft(null);
         setLocation('/login');
       },
     });
@@ -204,7 +212,7 @@ function AppFrame() {
                   {current.isLoading ? <WorkspaceLoading /> : user ? <MetaChannelsPage /> : <Unauthenticated currentError={current.isError && httpStatus(current.error) !== 401 ? messageFrom(current.error, 'We couldn’t check your session. Please sign in to continue.') : null} />}
                 </Route>
                 <Route path="/planner">
-                  {current.isLoading ? <WorkspaceLoading /> : user ? <PublishingPlannerPage /> : <Unauthenticated currentError={current.isError && httpStatus(current.error) !== 401 ? messageFrom(current.error, 'We couldn’t check your session. Please sign in to continue.') : null} />}
+                  {current.isLoading ? <WorkspaceLoading /> : user ? <PublishingPlannerPage initialAiDraft={plannerDraft} onInitialAiDraftLoaded={clearPlannerDraft} /> : <Unauthenticated currentError={current.isError && httpStatus(current.error) !== 401 ? messageFrom(current.error, 'We couldn’t check your session. Please sign in to continue.') : null} />}
                 </Route>
                 <Route>
                   {current.isLoading ? (
@@ -213,6 +221,7 @@ function AppFrame() {
                     <PreviewWorkspace
                       embedded
                       initialSection={embeddedSection.id}
+                      onAiCreativeApproved={handleAiCreativeApproved}
                       onSectionChange={(next) => {
                         const destination = workspaceSections.find((section) => section.id === next)?.path;
                         setLocation(destination ?? '/');

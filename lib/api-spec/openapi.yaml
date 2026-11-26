@@ -413,6 +413,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreativeList"
+  /adpilot/ai/copy:
+    post:
+      operationId: generateAdpilotAiCopy
+      tags: [adpilot]
+      summary: Draft editable social copy for the current business
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiCreativeCopyInput"
+      responses:
+        "200":
+          description: Copy draft for review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiCreativeCopy"
+        "422":
+          description: Creative brief is invalid
+  /adpilot/ai/image:
+    post:
+      operationId: generateAdpilotAiImage
+      tags: [adpilot]
+      summary: Generate a private-review social image with Workers AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiCreativeImageInput"
+      responses:
+        "200":
+          description: Generated JPEG for explicit approval
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiCreativeImage"
+        "422":
+          description: Image prompt is invalid
   /adpilot/creatives/{id}:
     get:
       operationId: getAdpilotCreative
@@ -1176,6 +1216,66 @@ components:
           items:
             $ref: "#/components/schemas/MediaAsset"
       required: [assets]
+    AiCreativeCopyInput:
+      type: object
+      additionalProperties: false
+      properties:
+        businessContext:
+          type: string
+          minLength: 2
+          maxLength: 400
+        audience:
+          type: string
+          minLength: 2
+          maxLength: 300
+        goal:
+          type: string
+          minLength: 2
+          maxLength: 100
+        tone:
+          type: string
+          minLength: 2
+          maxLength: 120
+        offer:
+          type: string
+          maxLength: 300
+      required: [businessContext, audience, goal, tone, offer]
+    AiCreativeCopy:
+      type: object
+      additionalProperties: false
+      properties:
+        caption:
+          type: string
+          minLength: 1
+          maxLength: 2200
+        hashtags:
+          type: string
+          maxLength: 1000
+        imagePrompt:
+          type: string
+          minLength: 10
+          maxLength: 1600
+      required: [caption, hashtags, imagePrompt]
+    AiCreativeImageInput:
+      type: object
+      additionalProperties: false
+      properties:
+        prompt:
+          type: string
+          minLength: 10
+          maxLength: 1600
+      required: [prompt]
+    AiCreativeImage:
+      type: object
+      additionalProperties: false
+      properties:
+        imageBase64:
+          type: string
+          maxLength: 7000000
+        mimeType:
+          type: string
+          enum: [image/jpeg]
+      required: [imageBase64, mimeType]
     CreativeCreateInput:
       type: object
       properties:

@@ -330,6 +330,67 @@ export interface MediaList {
   assets: MediaAsset[];
 }
 
+export interface AiCreativeCopyInput {
+  /**
+     * @minLength 2
+     * @maxLength 400
+     */
+  businessContext: string;
+  /**
+     * @minLength 2
+     * @maxLength 300
+     */
+  audience: string;
+  /**
+     * @minLength 2
+     * @maxLength 100
+     */
+  goal: string;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  tone: string;
+  /** @maxLength 300 */
+  offer: string;
+}
+
+export interface AiCreativeCopy {
+  /**
+     * @minLength 1
+     * @maxLength 2200
+     */
+  caption: string;
+  /** @maxLength 1000 */
+  hashtags: string;
+  /**
+     * @minLength 10
+     * @maxLength 1600
+     */
+  imagePrompt: string;
+}
+
+export interface AiCreativeImageInput {
+  /**
+     * @minLength 10
+     * @maxLength 1600
+     */
+  prompt: string;
+}
+
+export type AiCreativeImageMimeType = typeof AiCreativeImageMimeType[keyof typeof AiCreativeImageMimeType];
+
+
+export const AiCreativeImageMimeType = {
+  'image/jpeg': 'image/jpeg',
+} as const;
+
+export interface AiCreativeImage {
+  /** @maxLength 7000000 */
+  imageBase64: string;
+  mimeType: AiCreativeImageMimeType;
+}
+
 export type CreativeCreateInputImageFormat = typeof CreativeCreateInputImageFormat[keyof typeof CreativeCreateInputImageFormat];
 
 

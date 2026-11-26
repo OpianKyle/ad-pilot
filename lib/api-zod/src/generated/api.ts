@@ -906,6 +906,71 @@ export const CreateAdpilotCreativesResponse = zod.object({
 
 
 /**
+ * @summary Draft editable social copy for the current business
+ */
+export const generateAdpilotAiCopyBodyBusinessContextMin = 2;
+export const generateAdpilotAiCopyBodyBusinessContextMax = 400;
+
+export const generateAdpilotAiCopyBodyAudienceMin = 2;
+export const generateAdpilotAiCopyBodyAudienceMax = 300;
+
+export const generateAdpilotAiCopyBodyGoalMin = 2;
+export const generateAdpilotAiCopyBodyGoalMax = 100;
+
+export const generateAdpilotAiCopyBodyToneMin = 2;
+export const generateAdpilotAiCopyBodyToneMax = 120;
+
+export const generateAdpilotAiCopyBodyOfferMax = 300;
+
+
+
+export const GenerateAdpilotAiCopyBody = zod.object({
+  "businessContext": zod.string().min(generateAdpilotAiCopyBodyBusinessContextMin).max(generateAdpilotAiCopyBodyBusinessContextMax),
+  "audience": zod.string().min(generateAdpilotAiCopyBodyAudienceMin).max(generateAdpilotAiCopyBodyAudienceMax),
+  "goal": zod.string().min(generateAdpilotAiCopyBodyGoalMin).max(generateAdpilotAiCopyBodyGoalMax),
+  "tone": zod.string().min(generateAdpilotAiCopyBodyToneMin).max(generateAdpilotAiCopyBodyToneMax),
+  "offer": zod.string().max(generateAdpilotAiCopyBodyOfferMax)
+})
+
+export const generateAdpilotAiCopyResponseCaptionMax = 2200;
+
+export const generateAdpilotAiCopyResponseHashtagsMax = 1000;
+
+export const generateAdpilotAiCopyResponseImagePromptMin = 10;
+export const generateAdpilotAiCopyResponseImagePromptMax = 1600;
+
+
+
+export const GenerateAdpilotAiCopyResponse = zod.object({
+  "caption": zod.string().min(1).max(generateAdpilotAiCopyResponseCaptionMax),
+  "hashtags": zod.string().max(generateAdpilotAiCopyResponseHashtagsMax),
+  "imagePrompt": zod.string().min(generateAdpilotAiCopyResponseImagePromptMin).max(generateAdpilotAiCopyResponseImagePromptMax)
+})
+
+
+/**
+ * @summary Generate a private-review social image with Workers AI
+ */
+export const generateAdpilotAiImageBodyPromptMin = 10;
+export const generateAdpilotAiImageBodyPromptMax = 1600;
+
+
+
+export const GenerateAdpilotAiImageBody = zod.object({
+  "prompt": zod.string().min(generateAdpilotAiImageBodyPromptMin).max(generateAdpilotAiImageBodyPromptMax)
+})
+
+export const generateAdpilotAiImageResponseImageBase64Max = 7000000;
+
+
+
+export const GenerateAdpilotAiImageResponse = zod.object({
+  "imageBase64": zod.string().max(generateAdpilotAiImageResponseImageBase64Max),
+  "mimeType": zod.enum(['image/jpeg'])
+})
+
+
+/**
  * @summary Get one creative from the current workspace
  */
 export const getAdpilotCreativePathIdRegExp = new RegExp('^[a-f0-9]{32}$');

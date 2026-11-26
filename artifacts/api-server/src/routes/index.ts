@@ -5,6 +5,7 @@ import campaignsRouter from "./campaigns";
 import assetsRouter from "./assets";
 import metaRouter from "./meta";
 import postsRouter from "./posts";
+import aiCreativeRouter from "./ai-creative";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(campaignsRouter);
 router.use(metaRouter);
 router.use(assetsRouter);
 router.use(postsRouter);
+router.use(aiCreativeRouter);
 
 export default router;

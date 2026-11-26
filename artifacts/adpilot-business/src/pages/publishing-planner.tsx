@@ -1,4 +1,4 @@
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertCircle,
@@ -30,6 +30,7 @@ import {
 } from '@workspace/api-client-react';
 import type { MediaAsset, ScheduledPost, ScheduledPostInput } from '@workspace/api-client-react';
 import { Link } from 'wouter';
+import type { ApprovedAiCreative } from '@/lib/creative-handoff';
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const PHOTO_TYPES = ['image/jpeg', 'image/png'] as const;
@@ -70,7 +71,13 @@ function prettyTime(value: string) {
   return new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(date);
 }
 
-export default function PublishingPlannerPage() {
+export default function PublishingPlannerPage({
+  initialAiDraft = null,
+  onInitialAiDraftLoaded,
+}: {
+  initialAiDraft?: ApprovedAiCreative | null;
+  onInitialAiDraftLoaded?: () => void;
+}) {
   const queryClient = useQueryClient();
   const csrf = useGetCsrfToken({ request: { credentials: 'include' } });
   const connection = useGetAdpilotMetaConnection({ request: { credentials: 'include' } });
@@ -100,6 +107,16 @@ export default function PublishingPlannerPage() {
   const [instagramSelected, setInstagramSelected] = useState(false);
   const [scheduledLocal, setScheduledLocal] = useState(() => localDateTimeValue(new Date(Date.now() + 60 * 60 * 1000)));
   const [filter, setFilter] = useState<PostFilter>('all');
+
+  useEffect(() => {
+    if (!initialAiDraft) return;
+    setSelectedAssetId(initialAiDraft.assetId);
+    setCaption(initialAiDraft.caption);
+    setHashtags(initialAiDraft.hashtags);
+    setFormError('');
+    setNotice('Approved AI draft loaded. Review the copy and destinations before scheduling or publishing.');
+    onInitialAiDraftLoaded?.();
+  }, [initialAiDraft, onInitialAiDraftLoaded]);
 
   const destination = connection.data;
   const canFacebook = Boolean(destination?.connected && destination.facebookPageId);

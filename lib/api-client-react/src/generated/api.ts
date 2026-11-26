@@ -30,6 +30,10 @@ import type {
   AdpilotDashboard,
   AdpilotWorkspace,
   AdpilotWorkspaceSettings,
+  AiCreativeCopy,
+  AiCreativeCopyInput,
+  AiCreativeImage,
+  AiCreativeImageInput,
   AuthResponse,
   AutopilotInput,
   Brief,
@@ -2405,6 +2409,182 @@ export const useCreateAdpilotCreatives = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getCreateAdpilotCreativesMutationOptions(options), queryClient);
+    }
+
+export const getGenerateAdpilotAiCopyUrl = () => {
+
+
+
+
+  return `/api/adpilot/ai/copy`
+}
+
+/**
+ * @summary Draft editable social copy for the current business
+ */
+export const generateAdpilotAiCopy = async (aiCreativeCopyInput: AiCreativeCopyInput, options?: Parameters<typeof customFetch>[1]): Promise<AiCreativeCopy> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AiCreativeCopy>(getGenerateAdpilotAiCopyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(aiCreativeCopyInput)
+  }
+);}
+
+
+
+
+
+export const getGenerateAdpilotAiCopyMutationKey = () => ['generateAdpilotAiCopy'] as const;
+
+export const getGenerateAdpilotAiCopyMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateAdpilotAiCopy>>, TError,GenerateAdpilotAiCopyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof generateAdpilotAiCopy>>, TError,GenerateAdpilotAiCopyMutationVariables, TContext> => {
+
+const mutationKey = getGenerateAdpilotAiCopyMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateAdpilotAiCopy>>, GenerateAdpilotAiCopyMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  generateAdpilotAiCopy(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GenerateAdpilotAiCopyMutationResult = NonNullable<Awaited<ReturnType<typeof generateAdpilotAiCopy>>>
+    export type GenerateAdpilotAiCopyMutationBody = BodyType<AiCreativeCopyInput>
+    export type GenerateAdpilotAiCopyMutationError = ErrorType<void>
+    export type GenerateAdpilotAiCopyMutationVariables = {data: BodyType<AiCreativeCopyInput>}
+
+    /**
+ * @summary Draft editable social copy for the current business
+ */
+export const useGenerateAdpilotAiCopy = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateAdpilotAiCopy>>, TError,GenerateAdpilotAiCopyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof generateAdpilotAiCopy>>,
+        TError,
+        GenerateAdpilotAiCopyMutationVariables,
+        TContext
+      > => {
+      return useMutation(getGenerateAdpilotAiCopyMutationOptions(options), queryClient);
+    }
+
+export const getGenerateAdpilotAiImageUrl = () => {
+
+
+
+
+  return `/api/adpilot/ai/image`
+}
+
+/**
+ * @summary Generate a private-review social image with Workers AI
+ */
+export const generateAdpilotAiImage = async (aiCreativeImageInput: AiCreativeImageInput, options?: Parameters<typeof customFetch>[1]): Promise<AiCreativeImage> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AiCreativeImage>(getGenerateAdpilotAiImageUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(aiCreativeImageInput)
+  }
+);}
+
+
+
+
+
+export const getGenerateAdpilotAiImageMutationKey = () => ['generateAdpilotAiImage'] as const;
+
+export const getGenerateAdpilotAiImageMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateAdpilotAiImage>>, TError,GenerateAdpilotAiImageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof generateAdpilotAiImage>>, TError,GenerateAdpilotAiImageMutationVariables, TContext> => {
+
+const mutationKey = getGenerateAdpilotAiImageMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateAdpilotAiImage>>, GenerateAdpilotAiImageMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  generateAdpilotAiImage(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GenerateAdpilotAiImageMutationResult = NonNullable<Awaited<ReturnType<typeof generateAdpilotAiImage>>>
+    export type GenerateAdpilotAiImageMutationBody = BodyType<AiCreativeImageInput>
+    export type GenerateAdpilotAiImageMutationError = ErrorType<void>
+    export type GenerateAdpilotAiImageMutationVariables = {data: BodyType<AiCreativeImageInput>}
+
+    /**
+ * @summary Generate a private-review social image with Workers AI
+ */
+export const useGenerateAdpilotAiImage = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateAdpilotAiImage>>, TError,GenerateAdpilotAiImageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof generateAdpilotAiImage>>,
+        TError,
+        GenerateAdpilotAiImageMutationVariables,
+        TContext
+      > => {
+      return useMutation(getGenerateAdpilotAiImageMutationOptions(options), queryClient);
     }
 
 export const getGetAdpilotCreativeUrl = (id: string,) => {
